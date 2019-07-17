@@ -1,22 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Swingy.java                                        :+:      :+:    :+:   */
+/*   Armor.java                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/07/16 12:11:54 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/17 17:33:44 by tbaagman         ###   ########.fr       */
+/*   Created: 2019/07/17 17:04:58 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/07/17 17:13:11 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode;
+package za.com.wethinkcode.model.artifacts;
 
-import za.com.wethinkcode.model.characters.*;
+public class Armor extends Artifact {
 
-public class Swingy {
-	public static void main(String[] args) {
-		Characters characters = new Hero("Thor", 1, 1, 1);
-		System.out.println(characters.toString());
+	public Armor(String name, int points) {
+		super(name, points);
 	}
 }
