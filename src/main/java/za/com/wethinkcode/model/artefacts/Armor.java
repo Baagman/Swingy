@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Weapon.java                                        :+:      :+:    :+:   */
+/*   Armor.java                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/07/17 17:03:01 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/17 17:40:57 by tbaagman         ###   ########.fr       */
+/*   Created: 2019/07/17 17:04:58 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/07/18 10:13:42 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode.model.artifacts;
+package za.com.wethinkcode.model.artefacts;
 
-public class Weapon extends Artifact {
+public class Armor extends Artefact {
 
-	public Weapon(String name, int points) {
+	public Armor(String name, int points) {
 		super(name, points);
 	}
 }

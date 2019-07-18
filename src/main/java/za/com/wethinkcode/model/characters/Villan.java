@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/17 16:50:19 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/17 17:30:46 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/07/18 10:13:27 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,16 @@ package za.com.wethinkcode.model.characters;
 
 import lombok.Getter;
 import lombok.Setter;
-import za.com.wethinkcode.model.artifacts.Artifact;
+import za.com.wethinkcode.model.artefacts.Artefact;
 
 @Getter
 @Setter
 public class Villan extends Characters {
+
+	private Artefact artefact;
 	
-	private Artifact artifact;
-	
-	protected Villan(String name, int attack, int defense, int hitPoints, Artifact artifact) {
+	protected Villan(String name, int attack, int defense, int hitPoints, Artefact artifact) {
 		super(name, attack, defense, hitPoints);
-		this.artifact = artifact;
+		this.artefact = artifact;
 	}
 }
