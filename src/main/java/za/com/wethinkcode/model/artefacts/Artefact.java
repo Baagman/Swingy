@@ -1,18 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Swingy.java                                        :+:      :+:    :+:   */
+/*   Artefact.java                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/07/16 12:11:54 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/18 10:52:33 by tbaagman         ###   ########.fr       */
+/*   Created: 2019/07/17 16:40:16 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/07/18 10:12:42 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode;
+package za.com.wethinkcode.model.artefacts;
 
-public class Swingy {
-	public static void main(String[] args) {
-	}
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+abstract public class Artefact {
+    protected String name;
+    protected int points;
+
+    protected Artefact(String name, int points) {
+        this.name = name;
+        this.points = points;
+    }
 }
