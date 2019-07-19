@@ -6,7 +6,6 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/17 15:33:44 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/19 14:49:24 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +61,7 @@ public class Hero extends Characters {
 			return ;
 		}
 	}
+
 	
 	// TODO: Implement A EquidHelm method
 	public void equipHelm(Helm helm) {
@@ -77,6 +77,5 @@ public class Hero extends Characters {
 			// TODO: Implement A Leveling Up method
 			// TODO: Implement A Method that will update the map when the player levels up
 		}
-		return ;
 	}	
 }
