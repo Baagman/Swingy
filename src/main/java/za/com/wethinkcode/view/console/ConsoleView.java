@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/19 10:48:49 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/19 15:56:27 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/07/19 16:28:06 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public class ConsoleView {
 		setMap(new String[this.mapSize][this.mapSize]);
 		for (int y = 0; y < this.mapSize; y++) {
 			for (int x = 0; x < this.mapSize; x++) {
-				if ((x == hero.getPosition().getX()) && (y == hero.getPosition().getY())) {
+				if ((x == getHero().getPosition().getX()) && (y == getHero().getPosition().getY())) {
 					this.map[y][x] = "H";
 				} else {
 					this.map[y][x] = ".";
