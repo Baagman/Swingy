@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/17 15:33:44 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/18 14:36:43 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/07/19 14:49:24 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ import lombok.Setter;
 import za.com.wethinkcode.model.artefacts.Armor;
 import za.com.wethinkcode.model.artefacts.Helm;
 import za.com.wethinkcode.model.artefacts.Weapon;
-import za.com.wethinkcode.model.coordinates.Coordinates;
 
 @Getter
 @Setter
@@ -27,15 +26,16 @@ public class Hero extends Characters {
 	private String 		heroClass;
 	private int 		level;
 	private int			xp;
-	private Coordinates playerCoord;
 	
 	@Setter(AccessLevel.NONE)
 	private Weapon		weapon;
 	private Armor		armor;
 	private Helm		helm;
 	
-    public Hero(String name, int attack, int defense, int hitPoints) {
-        super(name, attack, defense, hitPoints);
+    public Hero(String name, int attack, int defense, int hitPoints, int level, int xp) {
+		super(name, attack, defense, hitPoints);
+		setXp(xp);
+		setLevel(level);
 	}
 
 	public void equipWeapon(Weapon weapon) {
@@ -47,6 +47,7 @@ public class Hero extends Characters {
 			}
 			this.attack += weapon.getPoints();
 			this.weapon = weapon;
+			return ;
 		}
 	}
 	
@@ -58,6 +59,7 @@ public class Hero extends Characters {
 			}
 			this.defense += armor.getPoints();
 			this.armor = armor;
+			return ;
 		}
 	}
 	
@@ -75,5 +77,6 @@ public class Hero extends Characters {
 			// TODO: Implement A Leveling Up method
 			// TODO: Implement A Method that will update the map when the player levels up
 		}
+		return ;
 	}	
 }

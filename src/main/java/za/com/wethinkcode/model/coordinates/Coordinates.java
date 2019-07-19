@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/18 12:09:16 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/18 15:08:52 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/07/19 12:29:01 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Coordinates {
-
 	@Min(0)
 	private int x;
 	@Min(0)
 	private int y;
+
+	public Coordinates(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
 }
