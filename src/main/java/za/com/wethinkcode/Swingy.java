@@ -10,7 +10,20 @@
 
 package za.com.wethinkcode;
 
+import java.io.File;
+import za.com.wethinkcode.contoller.ConsoleController;
+
 public class Swingy {
 	public static void main(String[] args) {
+
+		if (args.length == 1) {
+			File file = new File(args[0]);
+
+			if ((file.exists()) && (file.isFile())) {
+				ConsoleController consoleController = new ConsoleController(file);
+				consoleController.Read();
+				consoleController.GameInit();
+			}
+		}
 	}
 }
