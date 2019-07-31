@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/19 10:48:49 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/29 13:52:01 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/07/31 12:44:50 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,16 @@ public class ConsoleView {
 		return ;
 	}
 
-	public void DisplayMenu() {
-		System.out.println("1 - North");
-		System.out.println("2 - East");
-		System.out.println("3 - South");
-		System.out.println("4 - West");
-		System.out.println("5 - Exit");
+	public void DisplayMenu(String gameMode) {
+		
+		switch (gameMode.toLowerCase()) {
+			case "play":
+				System.out.println("1 - North");
+				System.out.println("2 - East");
+				System.out.println("3 - South");
+				System.out.println("4 - West");
+				System.out.println("5 - Exit");
+				break;
+		}
 	}
 }

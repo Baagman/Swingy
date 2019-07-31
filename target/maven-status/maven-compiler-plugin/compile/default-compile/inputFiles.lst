@@ -1,0 +1,12 @@
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/coordinates/Coordinates.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/characters/Characters.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/artefacts/Artefact.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/util/Database.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/Swingy.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/characters/Villan.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/contoller/ConsoleController.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/artefacts/Helm.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/artefacts/Armor.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/artefacts/Weapon.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/model/characters/Hero.java
+/goinfre/tbaagman/Swingy/src/main/java/za/com/wethinkcode/view/console/ConsoleView.java

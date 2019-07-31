@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/18 16:06:42 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/29 14:45:21 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/07/31 12:45:45 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,21 +63,21 @@ public class ConsoleController {
 		
 		boolean quitGame = true;
 		consoleView = new ConsoleView(hero);
+		Scanner scanner = new Scanner(System.in);
 		hero.setPosition(new Coordinates(consoleView.getMapSize() / 2, consoleView.getMapSize() / 2));
 		
 		while (quitGame) {
-			Scanner scanner = new Scanner(System.in);
 			String userInput = null;
 			
 			consoleView.printAndUpdateMap();
-			consoleView.DisplayMenu();
+			consoleView.DisplayMenu("Play");
 			userInput = scanner.nextLine();
 			if (userInput.equalsIgnoreCase("5"))
 				quitGame = false;
 			else
 				Move(Integer.parseInt(userInput), getConsoleView().getMapSize());
 		}
-
+		scanner.close();
 	}
 
 	public void Move(int direction, int sizeOfMap) {

@@ -1,0 +1,12 @@
+za/com/wethinkcode/model/artefacts/Armor.class
+za/com/wethinkcode/model/util/Database.class
+za/com/wethinkcode/contoller/ConsoleController.class
+za/com/wethinkcode/model/artefacts/Helm.class
+za/com/wethinkcode/model/artefacts/Artefact.class
+za/com/wethinkcode/view/console/ConsoleView.class
+za/com/wethinkcode/model/characters/Characters.class
+za/com/wethinkcode/model/artefacts/Weapon.class
+za/com/wethinkcode/model/coordinates/Coordinates.class
+za/com/wethinkcode/model/characters/Hero.class
+za/com/wethinkcode/Swingy.class
+za/com/wethinkcode/model/characters/Villan.class

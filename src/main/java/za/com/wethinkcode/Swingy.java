@@ -10,20 +10,11 @@
 
 package za.com.wethinkcode;
 
-import java.io.File;
-import za.com.wethinkcode.contoller.ConsoleController;
+import za.com.wethinkcode.model.util.Database;
 
 public class Swingy {
-	public static void main(String[] args) {
-
-		if (args.length == 1) {
-			File file = new File(args[0]);
-
-			if ((file.exists()) && (file.isFile())) {
-				ConsoleController consoleController = new ConsoleController(file);
-				consoleController.Read();
-				consoleController.GameInit();
-			}
-		}
-	}
+  public static void main( String args[] ) {
+	  Database database = new Database();
+	  database.createDatabase();
+  }
 }
