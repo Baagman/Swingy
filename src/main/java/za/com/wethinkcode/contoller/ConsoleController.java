@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/18 16:06:42 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/08/01 11:00:29 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/08/01 14:18:31 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ import java.util.Scanner;
 import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.model.characters.Hero;
+import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
 
 @Getter
@@ -30,6 +31,7 @@ public class ConsoleController {
 	private Hero hero;
 	private ConsoleView consoleView;
 	private Scanner scanner;
+	private Database database;
 	
 	public ConsoleController(File file) {
 		this.file = file;
@@ -63,6 +65,7 @@ public class ConsoleController {
 		boolean quitGame = true;
 		scanner = new Scanner(System.in);
 		consoleView = new ConsoleView();
+		database = new Database();
 		
 		while (quitGame) {
 			String userInput = null;
@@ -73,8 +76,12 @@ public class ConsoleController {
 				quitGame = false;
 			else if (userInput.equals("1")) {
 				
+			} else if (userInput.equals("2")) {
+				userInput = scanner.nextLine();
+				database.addNewHeroToTable(userInput);
+			} else if (userInput.equals("3")) {
+				
 			}
-			
 		}
 		scanner.close();
 	}
