@@ -10,11 +10,13 @@
 
 package za.com.wethinkcode;
 
-import za.com.wethinkcode.model.util.Database;
+import java.io.File;
+
+import za.com.wethinkcode.contoller.ConsoleController;
 
 public class Swingy {
   public static void main( String args[] ) {
-	  Database database = new Database();
-	  database.createDatabase();
+    ConsoleController consoleController = new ConsoleController(new File(args[0]));
+    consoleController.GameInit();
   }
 }

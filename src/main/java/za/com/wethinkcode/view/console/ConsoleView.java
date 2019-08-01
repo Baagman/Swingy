@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/19 10:48:49 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/31 12:44:50 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/07/31 16:15:01 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,6 @@ public class ConsoleView {
 	private Hero 		hero;
 	private String[][] 	map;
 	private int 		mapSize;
-	
-	public ConsoleView(Hero hero) {
-		this.hero = hero;
-		this.mapSize = (hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2);
-	}
 	
 	public void printAndUpdateMap() {
 	
@@ -53,12 +48,18 @@ public class ConsoleView {
 		
 		switch (gameMode.toLowerCase()) {
 			case "play":
+				System.out.println("0 - Exit");
 				System.out.println("1 - North");
 				System.out.println("2 - East");
 				System.out.println("3 - South");
 				System.out.println("4 - West");
-				System.out.println("5 - Exit");
 				break;
+			case "start":
+				System.out.println("0 - Exit");
+				System.out.println("1 - Select Hero");
+				System.out.println("2 - Create new Hero");
+				System.out.println("3 - Switch To GUI");
+				break;				
 		}
 	}
 }

@@ -6,6 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/17 15:33:44 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/08/01 10:58:14 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +26,7 @@ public class Hero extends Characters {
 	private String 		heroClass;
 	private int 		level;
 	private int			xp;
+	private int			id;
 	
 	@Setter(AccessLevel.NONE)
 	private Weapon		weapon;

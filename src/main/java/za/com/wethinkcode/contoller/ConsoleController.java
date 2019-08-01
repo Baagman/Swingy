@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/18 16:06:42 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/07/31 12:45:45 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/08/01 11:00:29 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-
 import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.model.characters.Hero;
-import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.view.console.ConsoleView;
 
 @Getter
@@ -31,6 +29,7 @@ public class ConsoleController {
 	private File file;
 	private Hero hero;
 	private ConsoleView consoleView;
+	private Scanner scanner;
 	
 	public ConsoleController(File file) {
 		this.file = file;
@@ -46,10 +45,10 @@ public class ConsoleController {
 			while ((line = bufferedReader.readLine()) != null) {
 				splitParams = line.split(",");
 				setHero(new Hero(splitParams[0], 
-						Integer.parseInt(splitParams[1]), 
-						Integer.parseInt(splitParams[2]), 
-						Integer.parseInt(splitParams[3]), 
-						Integer.parseInt(splitParams[4]), 
+						Integer.parseInt(splitParams[1]),
+						Integer.parseInt(splitParams[2]),
+						Integer.parseInt(splitParams[3]),
+						Integer.parseInt(splitParams[4]),
 						Integer.parseInt(splitParams[5])));
 			}
 			bufferedReader.close();
@@ -62,20 +61,20 @@ public class ConsoleController {
 	public void GameInit() {
 		
 		boolean quitGame = true;
-		consoleView = new ConsoleView(hero);
-		Scanner scanner = new Scanner(System.in);
-		hero.setPosition(new Coordinates(consoleView.getMapSize() / 2, consoleView.getMapSize() / 2));
+		scanner = new Scanner(System.in);
+		consoleView = new ConsoleView();
 		
 		while (quitGame) {
 			String userInput = null;
 			
-			consoleView.printAndUpdateMap();
-			consoleView.DisplayMenu("Play");
+			consoleView.DisplayMenu("Start");
 			userInput = scanner.nextLine();
-			if (userInput.equalsIgnoreCase("5"))
+			if (userInput.equals("0"))
 				quitGame = false;
-			else
-				Move(Integer.parseInt(userInput), getConsoleView().getMapSize());
+			else if (userInput.equals("1")) {
+				
+			}
+			
 		}
 		scanner.close();
 	}
