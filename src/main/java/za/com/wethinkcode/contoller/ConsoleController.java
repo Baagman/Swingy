@@ -40,7 +40,7 @@ public class ConsoleController {
 	public void Read() {
 		String[] splitParams;
 		BufferedReader bufferedReader;
-		String line = null;
+		String line;
 		
 		try {
 			bufferedReader = new BufferedReader(new FileReader(this.file));
@@ -57,7 +57,6 @@ public class ConsoleController {
 		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
-		return ;
 	}
 	
 	public void GameInit() {
@@ -67,15 +66,20 @@ public class ConsoleController {
 		consoleView = new ConsoleView();
 		
 		while (quitGame) {
-			String userInput = null;
+			String userInput;
 			
 			consoleView.DisplayMenu("Start");
 			userInput = scanner.nextLine();
 			if (userInput.equals("0"))
 				quitGame = false;
 			else if (userInput.equals("1")) {
-				consoleView.displayHeros(database.selectHeros());
+				if (consoleView.displayHeros(database.selectAvailabeHeros()) > 0) {
+					System.out.println("Please Select A Hero By Entering Their Name:");
+					userInput = scanner.nextLine();
+				} else
+					System.out.println("No Heroes available...Please Create A New Hero..");
 			} else if (userInput.equals("2")) {
+				System.out.print("Enter the Hero's name: ");
 				userInput = scanner.nextLine();
 				database.addNewHeroToTable(userInput);
 			} else if (userInput.equals("3")) {

@@ -43,26 +43,21 @@ public class Database {
 
 	private void createHeroTable() throws SQLException {
 
-		try {
-			StringBuilder sqlCreateTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS HEROS (\n");
-			sqlCreateTable.append(" name TEXT NOT NULL, \n");
-			sqlCreateTable.append(" attack INTEGER, \n");
-			sqlCreateTable.append(" defense INTEGER, \n");
-			sqlCreateTable.append(" hitpoints INTEGER, \n");
-			sqlCreateTable.append(" level INTEGER, \n");
-			sqlCreateTable.append(" experience INTEGER\n");
-			sqlCreateTable.append(");");
-			setStatement(connection.createStatement());
-			statement.execute(sqlCreateTable.toString());
-			getStatement().close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		StringBuilder sqlCreateTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS HEROES (\n");
+		sqlCreateTable.append(" name TEXT NOT NULL, \n");
+		sqlCreateTable.append(" attack INTEGER, \n");
+		sqlCreateTable.append(" defense INTEGER, \n");
+		sqlCreateTable.append(" hitpoints INTEGER, \n");
+		sqlCreateTable.append(" level INTEGER, \n");
+		sqlCreateTable.append(" experience INTEGER\n");
+		sqlCreateTable.append(");");
+		setStatement(connection.createStatement());
+		statement.execute(sqlCreateTable.toString());
+		getStatement().close();
 	}
 	
 	public void addNewHeroToTable(String heroName) {
-		String sqlInsertHero = "INSERT INTO HEROS VALUES(?, ?, ?, ?, ?, ?)";
+		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?)";
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(sqlInsertHero);
 			preparedStatement.setString(1, heroName);
@@ -78,8 +73,8 @@ public class Database {
 		}
 	}
 
-	public ResultSet selectHeros() {
-		String selectHeros = "SELECT * FROM HEROS;";
+	public ResultSet selectAvailabeHeros() {
+		String selectHeros = "SELECT * FROM HEROES;";
 		ResultSet resultSet = null;
 		try {
 			setStatement(getConnection().createStatement());

@@ -41,9 +41,9 @@ public class ConsoleView {
 				}
 				System.out.print(map[y][x]);
 			}
-			System.out.println("");
+			System.out.println(" ");
 		}
-		System.out.println("");
+		System.out.println(" ");
 		return ;
 	}
 
@@ -66,12 +66,13 @@ public class ConsoleView {
 		}
 	}
 
-	public void displayHeros(ResultSet resultSet) {
+	public int  displayHeros(ResultSet resultSet) {
+		int id = 0;
 		if (resultSet != null) {
 			try {
-				int id = 1;
-				String name = null;
+				String name;
 				while (resultSet.next()) {
+					++id;
 					System.out.println("ID: " + id);
 					name = resultSet.getString("name");
 					System.out.println("Name: " + name);
@@ -80,12 +81,14 @@ public class ConsoleView {
 					System.out.println("Hitpoints: " + resultSet.getInt("hitpoints"));
 					System.out.println("Level: " + resultSet.getInt("level"));
 					System.out.println("Experience: " + resultSet.getInt("experience"));
-					id++;
+					System.out.println("-----------------------");
 				}
+				return id;
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		return id;
 	}
 }
