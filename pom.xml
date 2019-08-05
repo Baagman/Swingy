@@ -44,7 +44,6 @@
 							<outputDirectory>${project.build.directory}/resources</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNever>true</overWriteIfNever>
 						</configuration>
 					</execution>
 				</executions>

@@ -6,7 +6,7 @@
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/18 16:06:42 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/08/01 14:18:31 by tbaagman         ###   ########.fr       */
+/*   Updated: 2019/08/05 14:14:04 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ public class ConsoleController {
 	private Scanner scanner;
 	private Database database;
 	
-	public ConsoleController(File file) {
-		this.file = file;
+	public ConsoleController(Database database ) {
+		this.database = database;
 	}
 
 	public void Read() {
@@ -65,7 +65,6 @@ public class ConsoleController {
 		boolean quitGame = true;
 		scanner = new Scanner(System.in);
 		consoleView = new ConsoleView();
-		database = new Database();
 		
 		while (quitGame) {
 			String userInput = null;
@@ -75,7 +74,7 @@ public class ConsoleController {
 			if (userInput.equals("0"))
 				quitGame = false;
 			else if (userInput.equals("1")) {
-				
+				consoleView.displayHeros(database.selectHeros());
 			} else if (userInput.equals("2")) {
 				userInput = scanner.nextLine();
 				database.addNewHeroToTable(userInput);
