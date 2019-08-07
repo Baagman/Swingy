@@ -15,9 +15,19 @@ package za.com.wethinkcode;
 import za.com.wethinkcode.contoller.ConsoleController;
 import za.com.wethinkcode.model.util.Database;
 
+import java.sql.SQLException;
+
 public class Swingy {
-    public static void main(String args[] ) {
-        ConsoleController consoleController = new ConsoleController(new Database());
-        consoleController.GameInit();
+    public static void main(String[] args ) {
+
+    	if ((args.length == 1) && (args[0].equalsIgnoreCase("console"))) {
+    		try {
+				ConsoleController consoleController = new ConsoleController(new Database());
+				consoleController.consoleGameInit();
+			} catch (SQLException | ClassNotFoundException | NullPointerException sqlException) {
+    			System.out.print("Caught in main:");
+    			System.out.println(sqlException.getMessage());
+			}
+		}
     }
 }
