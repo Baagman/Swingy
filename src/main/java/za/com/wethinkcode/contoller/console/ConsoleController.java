@@ -31,11 +31,11 @@ public class ConsoleController implements IController {
 	private ConsoleView consoleView;
 	private Scanner scanner;
 	private Database database;
-	
+
 	public ConsoleController(Database database) {
 		this.database = database;
 	}
-	
+
 	public void PlayerInit() throws SQLException {
 
 		boolean quitGame = true;

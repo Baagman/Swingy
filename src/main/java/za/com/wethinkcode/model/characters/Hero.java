@@ -27,20 +27,20 @@ public class Hero extends Characters {
 	private String 		heroClass;
 	private int 		level;
 	private int			xp;
-	
+
 	@Setter(AccessLevel.NONE)
 	private Weapon		weapon;
 	private Armor		armor;
 	private Helm		helm;
-	
-    public Hero(String name, int attack, int defense, int hitPoints, int level, int xp) {
+
+	public Hero(String name, int attack, int defense, int hitPoints, int level, int xp) {
 		super(name, attack, defense, hitPoints);
 		setXp(xp);
 		setLevel(level);
 	}
 
 	public void equipWeapon(Weapon weapon) {
-		
+
 		if (weapon != null) {
 			if (this.weapon != null) {
 				this.attack -= this.weapon.getPoints();
@@ -50,7 +50,7 @@ public class Hero extends Characters {
 			this.weapon = weapon;
 		}
 	}
-	
+
 	public void equipArmor(Armor armor) {
 		if (armor != null) {
 			if (this.armor != null) {
@@ -62,12 +62,12 @@ public class Hero extends Characters {
 		}
 	}
 
-	
+
 	// TODO: Implement A EquidHelm method
 	public void equipHelm(Helm helm) {
-		
+
 	}
-	
+
 	public void AddExperience(int addXp) {
 		int levelingUPXp;
 		this.xp += addXp;
@@ -77,5 +77,5 @@ public class Hero extends Characters {
 			// TODO: Implement A Leveling Up method
 			// TODO: Implement A Method that will update the map when the player levels up
 		}
-	}	
+	}
 }

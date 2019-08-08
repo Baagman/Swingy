@@ -23,14 +23,14 @@ import za.com.wethinkcode.model.characters.Hero;
 @Getter
 @Setter
 public class ConsoleView {
-	
+
 	@NotNull
 	private Hero 		hero;
 	private String[][] 	map;
 	private int 		mapSize;
-	
+
 	public void printAndUpdateMap() {
-	
+
 		setMap(new String[this.mapSize][this.mapSize]);
 		for (int y = 0; y < this.mapSize; y++) {
 			for (int x = 0; x < this.mapSize; x++) {
@@ -44,11 +44,10 @@ public class ConsoleView {
 			System.out.println(" ");
 		}
 		System.out.println(" ");
-		return ;
 	}
 
-	public void DisplayMenu(String gameMode) {
-		
+	public void DisplayOptions(String gameMode) {
+
 		switch (gameMode.toLowerCase()) {
 			case "play":
 				System.out.println("0 - Exit");
@@ -57,36 +56,40 @@ public class ConsoleView {
 				System.out.println("3 - South");
 				System.out.println("4 - West");
 				break;
-			case "start":
+			case "player selection":
 				System.out.println("0 - Exit");
 				System.out.println("1 - Select Hero");
 				System.out.println("2 - Create new Hero");
-				System.out.println("3 - Switch To GUI");
-				break;				
+				break;
+			case "selecting hero class":
+				System.out.println("0 - Exit");
+				System.out.println("1 - Warrior");
+				System.out.println("2 - Hunter");
+				System.out.println("3 - Priest");
 		}
+		System.out.println("-----------------------");
+		System.out.print("Please Input Option: ");
 	}
 
-	public int  displayHeros(ResultSet resultSet) {
+	public int  displayHeroStats(ResultSet resultSet) {
 		int id = 0;
 		if (resultSet != null) {
 			try {
-				String name;
 				while (resultSet.next()) {
 					++id;
-					System.out.println("ID: " + id);
-					name = resultSet.getString("name");
-					System.out.println("Name: " + name);
+					System.out.println("Id: " + id);
+					System.out.println("Name: " + resultSet.getString("name"));
 					System.out.println("Attack: " + resultSet.getInt("attack"));
 					System.out.println("Defense: " + resultSet.getInt("defense"));
-					System.out.println("Hitpoints: " + resultSet.getInt("hitpoints"));
+					System.out.println("Hit points: " + resultSet.getInt("hitpoints"));
 					System.out.println("Level: " + resultSet.getInt("level"));
 					System.out.println("Experience: " + resultSet.getInt("experience"));
 					System.out.println("-----------------------");
 				}
 				return id;
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (SQLException sqlException) {
+				System.out.println(sqlException.getMessage());
+				return 0;
 			}
 		}
 		return id;
