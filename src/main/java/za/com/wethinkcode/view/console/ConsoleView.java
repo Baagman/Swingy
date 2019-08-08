@@ -44,6 +44,7 @@ public class ConsoleView {
 			System.out.println(" ");
 		}
 		System.out.println(" ");
+		return ;
 	}
 
 	public void DisplayMenu(String gameMode) {
@@ -56,26 +57,28 @@ public class ConsoleView {
 				System.out.println("3 - South");
 				System.out.println("4 - West");
 				break;
-			case "player selection":
+			case "start":
 				System.out.println("0 - Exit");
 				System.out.println("1 - Select Hero");
 				System.out.println("2 - Create new Hero");
+				System.out.println("3 - Switch To GUI");
 				break;				
 		}
-		System.out.println("-----------------------");
 	}
 
 	public int  displayHeros(ResultSet resultSet) {
 		int id = 0;
 		if (resultSet != null) {
 			try {
+				String name;
 				while (resultSet.next()) {
 					++id;
 					System.out.println("ID: " + id);
-					System.out.println("Name: " + resultSet.getString("name"));
+					name = resultSet.getString("name");
+					System.out.println("Name: " + name);
 					System.out.println("Attack: " + resultSet.getInt("attack"));
 					System.out.println("Defense: " + resultSet.getInt("defense"));
-					System.out.println("Hit points: " + resultSet.getInt("hitpoints"));
+					System.out.println("Hitpoints: " + resultSet.getInt("hitpoints"));
 					System.out.println("Level: " + resultSet.getInt("level"));
 					System.out.println("Experience: " + resultSet.getInt("experience"));
 					System.out.println("-----------------------");

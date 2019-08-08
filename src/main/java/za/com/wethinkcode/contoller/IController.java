@@ -1,23 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Swingy.java                                        :+:      :+:    :+:   */
+/*   IController.java                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/07/16 12:11:54 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/08/05 14:14:38 by tbaagman         ###   ########.fr       */
+/*   Created: 2019/08/08 14:28:08 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/08/08 14:28:09 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode;
+package za.com.wethinkcode.contoller;
 
-import za.com.wethinkcode.contoller.ConsoleController;
-import za.com.wethinkcode.model.util.Database;
+import za.com.wethinkcode.model.characters.Hero;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class Swingy {
-    public static void main(String args[] ) {
-        ConsoleController consoleController = new ConsoleController(new Database());
-        consoleController.GameInit();
-    }
+public interface IController {
+
+	void PlayerInit() throws SQLException;
+	void Move(String direction, int sizeOfMap);
+	Hero createHero(ResultSet resultSet) throws SQLException;
+	boolean GameInit();
 }

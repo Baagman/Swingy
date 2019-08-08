@@ -1,23 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Swingy.java                                        :+:      :+:    :+:   */
+/*   GamePlay.java                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/07/16 12:11:54 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/08/05 14:14:38 by tbaagman         ###   ########.fr       */
+/*   Created: 2019/08/08 11:35:34 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/08/08 11:35:37 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode;
+package za.com.wethinkcode.contoller;
 
-import za.com.wethinkcode.contoller.ConsoleController;
-import za.com.wethinkcode.model.util.Database;
+import lombok.Getter;
+import lombok.Setter;
+import za.com.wethinkcode.model.characters.Hero;
 
-public class Swingy {
-    public static void main(String args[] ) {
-        ConsoleController consoleController = new ConsoleController(new Database());
-        consoleController.GameInit();
-    }
+@Getter
+@Setter
+public class GamePlay {
+
+	private Hero hero;
+
+	public GamePlay(Hero hero) {
+		this.hero = hero;
+	}
 }
