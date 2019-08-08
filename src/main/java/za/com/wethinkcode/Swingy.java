@@ -12,7 +12,7 @@
 
 package za.com.wethinkcode;
 
-import za.com.wethinkcode.contoller.ConsoleController;
+import za.com.wethinkcode.contoller.console.ConsoleController;
 import za.com.wethinkcode.model.util.Database;
 
 import java.sql.SQLException;
@@ -22,10 +22,10 @@ public class Swingy {
 
     	if ((args.length == 1) && (args[0].equalsIgnoreCase("console"))) {
     		try {
-				ConsoleController consoleController = new ConsoleController(new Database());
-				consoleController.consoleGameInit();
+				ConsoleController controller = new ConsoleController(new Database());
+				controller.PlayerInit();
 			} catch (SQLException | ClassNotFoundException | NullPointerException sqlException) {
-    			System.out.print("Caught in main:");
+    			System.out.print("Error: ");
     			System.out.println(sqlException.getMessage());
 			}
 		}

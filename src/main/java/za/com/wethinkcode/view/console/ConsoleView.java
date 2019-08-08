@@ -46,7 +46,7 @@ public class ConsoleView {
 		System.out.println(" ");
 	}
 
-	public void DisplayMenu(String gameMode) {
+	public void DisplayOptions(String gameMode) {
 		
 		switch (gameMode.toLowerCase()) {
 			case "play":
@@ -60,18 +60,24 @@ public class ConsoleView {
 				System.out.println("0 - Exit");
 				System.out.println("1 - Select Hero");
 				System.out.println("2 - Create new Hero");
-				break;				
+				break;
+			case "selecting hero class":
+				System.out.println("0 - Exit");
+				System.out.println("1 - Warrior");
+				System.out.println("2 - Hunter");
+				System.out.println("3 - Priest");
 		}
 		System.out.println("-----------------------");
+		System.out.print("Please Input Option: ");
 	}
 
-	public int  displayHeros(ResultSet resultSet) {
+	public int  displayHeroStats(ResultSet resultSet) {
 		int id = 0;
 		if (resultSet != null) {
 			try {
 				while (resultSet.next()) {
 					++id;
-					System.out.println("ID: " + id);
+					System.out.println("Id: " + id);
 					System.out.println("Name: " + resultSet.getString("name"));
 					System.out.println("Attack: " + resultSet.getInt("attack"));
 					System.out.println("Defense: " + resultSet.getInt("defense"));
@@ -81,9 +87,9 @@ public class ConsoleView {
 					System.out.println("-----------------------");
 				}
 				return id;
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (SQLException sqlException) {
+				System.out.println(sqlException.getMessage());
+				return 0;
 			}
 		}
 		return id;

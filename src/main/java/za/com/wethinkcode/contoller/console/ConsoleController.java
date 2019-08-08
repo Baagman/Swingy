@@ -10,26 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode.contoller;
+package za.com.wethinkcode.contoller.console;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 import lombok.Getter;
 import lombok.Setter;
+import za.com.wethinkcode.contoller.IController;
 import za.com.wethinkcode.model.characters.Hero;
+import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
 
 @Getter
 @Setter
-public class ConsoleController {
+public class ConsoleController implements IController {
 
-	private File file;
 	private Hero hero;
 	private ConsoleView consoleView;
 	private Scanner scanner;
@@ -38,74 +35,67 @@ public class ConsoleController {
 	public ConsoleController(Database database) {
 		this.database = database;
 	}
-
-	public void Read() {
-		String[] splitParams;
-		BufferedReader bufferedReader;
-		String line;
-		
-		try {
-			bufferedReader = new BufferedReader(new FileReader(this.file));
-			while ((line = bufferedReader.readLine()) != null) {
-				splitParams = line.split(",");
-			}
-			bufferedReader.close();
-		} catch (IOException exception) {
-			exception.printStackTrace();
-		}
-	}
 	
-	public void consoleGameInit() throws SQLException {
-		
+	public void PlayerInit() throws SQLException {
+
 		boolean quitGame = true;
-		scanner = new Scanner(System.in);
+		this.scanner = new Scanner(System.in);
 		consoleView = new ConsoleView();
 
 		while (quitGame) {
-			consoleView.DisplayMenu("Player Selection");
+			consoleView.DisplayOptions("Player Selection");
 			String userInput = scanner.nextLine();
-			if (userInput.equals("0"))
-				quitGame = false;
-			else if (userInput.equals("1")) {
-				if (consoleView.displayHeros(database.AvailabeHeros()) > 0) {
-					System.out.println("Please Select A Hero By Entering Their Name:");
+			switch (userInput) {
+				case "0":
+					quitGame = false;
+					break;
+				case "1":
+					if (consoleView.displayHeroStats(database.AvailableHeroes()) > 0) {
+						System.out.print("Please Select A Hero By Entering Their Name: ");
+						userInput = scanner.nextLine();
+						setHero(createHero(database.selectHero(userInput)));
+						if (getHero() != null) {
+							quitGame = GameInit();
+						} else
+							throw new SQLException("No Such Hero");
+					} else
+						System.out.println("No Heroes available...Please Create A New Hero..");
+					break;
+				case "2":
+					System.out.print("To Create A New Hero Enter the Hero's name: ");
 					userInput = scanner.nextLine();
-					createHero(database.selectHero(userInput));
-				} else
-					System.out.println("No Heroes available...Please Create A New Hero..");
-			} else if (userInput.equals("2")) {
-				System.out.print("Enter the Hero's name: ");
-				userInput = scanner.nextLine();
-				database.addNewHeroToTable(userInput);
+					database.addNewHeroToTable(userInput);
+					break;
 			}
 		}
 		scanner.close();
 	}
 
-	public void Move(int direction, int sizeOfMap) {
+	public void Move(String direction, int sizeOfMap) {
+
 
 		switch (direction) {
-			case 1:
+			case "1":
 				if (getHero().getPosition().getY() > 0)
 					getHero().getPosition().setY(getHero().getPosition().getY() - 1);
 				break;
-			case 2:
+			case "2":
 				if (getHero().getPosition().getX() < sizeOfMap - 1)
 					getHero().getPosition().setX(getHero().getPosition().getX() + 1);
 				break;
-			case 3:
+			case "3":
 				if (getHero().getPosition().getY() < (sizeOfMap - 1))
 					getHero().getPosition().setY(getHero().getPosition().getY() + 1);
 				break;
-			case 4:
+			case "4":
 				if (getHero().getPosition().getX() > 0)
 					getHero().getPosition().setX(getHero().getPosition().getX() - 1);
 				break;
 		}
 	}
 
-	private Hero createHero(ResultSet resultSet) throws SQLException {
-		if (resultSet != null) {
+	public Hero createHero(ResultSet resultSet) throws SQLException {
+		if ((resultSet != null) && (resultSet.next())) {
 			return new Hero(resultSet.getString("name"),
 					resultSet.getInt("attack"),
 					resultSet.getInt("defense"),
@@ -114,5 +104,28 @@ public class ConsoleController {
 					resultSet.getInt("experience"));
 		}
 		return null;
+	}
+
+	public boolean GameInit() {
+
+		int playerPosition;
+
+		getConsoleView().setMapSize((getHero().getLevel() - 1) * 5 + 10 - (getHero().getLevel() % 2));
+		playerPosition = getConsoleView().getMapSize() / 2;
+		getHero().setPosition(new Coordinates(playerPosition, playerPosition));
+		getConsoleView().setHero(getHero());
+
+		while (true) {
+			String userInput;
+			getConsoleView().printAndUpdateMap();
+			getConsoleView().DisplayOptions("Play");
+			userInput = getScanner().nextLine();
+			if (userInput.equals("0"))
+				break;
+			else {
+				Move(userInput, getConsoleView().getMapSize());
+			}
+		}
+		return false;
 	}
 }

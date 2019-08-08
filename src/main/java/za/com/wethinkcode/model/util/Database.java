@@ -34,10 +34,9 @@ public class Database {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:Swingy.db");
-			connection.setAutoCommit(false);
 			createHeroTable();
 		} catch (SQLException sqlException) {
-			throw new SQLException("Unable to connect to the database:" + sqlException.getMessage());
+			throw new SQLException("Unable to connect to the database: " + sqlException.getMessage());
 		} catch (ClassNotFoundException classNotFoundException) {
 			throw new ClassNotFoundException(classNotFoundException.getMessage());
 		}
@@ -47,6 +46,7 @@ public class Database {
 
 		StringBuilder sqlCreateTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS HEROES (\n");
 		sqlCreateTable.append(" name TEXT NOT NULL, \n");
+		// TODO -- sqlCreateTable.append(" hero class TEXT NOT NULL, \n");
 		sqlCreateTable.append(" attack INTEGER, \n");
 		sqlCreateTable.append(" defense INTEGER, \n");
 		sqlCreateTable.append(" hitpoints INTEGER, \n");
@@ -76,14 +76,14 @@ public class Database {
 		}
 	}
 
-	public ResultSet AvailabeHeros() throws SQLException {
+	public ResultSet AvailableHeroes() throws SQLException {
 		String selectHeros = "SELECT * FROM HEROES;";
 		ResultSet resultSet;
 		try {
 			setStatement(getConnection().createStatement());
 			resultSet = getStatement().executeQuery(selectHeros);
 		} catch (SQLException sqlException) {
-			throw new SQLException("Unable to connect to database" + sqlException.getMessage());
+			throw new SQLException("Unable to connect to database: " + sqlException.getMessage());
 		}
 		return resultSet;
 	}
@@ -96,7 +96,7 @@ public class Database {
 			preparedStatement.setString(1, name);
 			resultSet = preparedStatement.executeQuery();
 		} catch (SQLException sqlException) {
-			throw new SQLException("Unable to connect to database" + sqlException.getMessage());
+			throw new SQLException("Unable to connect to database: " + sqlException.getMessage());
 		}
 		return resultSet;
 	}

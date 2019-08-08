@@ -18,6 +18,7 @@ import lombok.Setter;
 import za.com.wethinkcode.model.artefacts.Armor;
 import za.com.wethinkcode.model.artefacts.Helm;
 import za.com.wethinkcode.model.artefacts.Weapon;
+import za.com.wethinkcode.model.coordinates.Coordinates;
 
 @Getter
 @Setter
@@ -26,7 +27,6 @@ public class Hero extends Characters {
 	private String 		heroClass;
 	private int 		level;
 	private int			xp;
-	private int			id;
 	
 	@Setter(AccessLevel.NONE)
 	private Weapon		weapon;
@@ -48,7 +48,6 @@ public class Hero extends Characters {
 			}
 			this.attack += weapon.getPoints();
 			this.weapon = weapon;
-			return ;
 		}
 	}
 	
@@ -60,7 +59,6 @@ public class Hero extends Characters {
 			}
 			this.defense += armor.getPoints();
 			this.armor = armor;
-			return ;
 		}
 	}
 
