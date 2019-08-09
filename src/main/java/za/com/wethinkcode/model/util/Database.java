@@ -18,6 +18,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.model.characters.Hero;
@@ -28,6 +30,8 @@ public class Database {
 
 	private Connection connection;
 	private Statement statement;
+	@Getter(AccessLevel.NONE)
+	private String heroClass;
 
 	public Database() throws SQLException, ClassNotFoundException {
 
@@ -46,7 +50,7 @@ public class Database {
 
 		StringBuilder sqlCreateTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS HEROES (\n");
 		sqlCreateTable.append(" name TEXT NOT NULL, \n");
-		// TODO -- sqlCreateTable.append(" hero class TEXT NOT NULL, \n");
+		sqlCreateTable.append(" heroclass TEXT NOT NULL, \n");
 		sqlCreateTable.append(" attack INTEGER, \n");
 		sqlCreateTable.append(" defense INTEGER, \n");
 		sqlCreateTable.append(" hitpoints INTEGER, \n");
@@ -60,15 +64,35 @@ public class Database {
 
 	public void addNewHeroToTable(String heroName) throws SQLException {
 
-		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?)";
+		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?, ?)";
+		int attack = 0;
+		int defense = 0;
+		int hitpoints = 3;
+
+		switch (this.heroClass) {
+			case "Warrior":
+				attack = 10;
+				defense = 15;
+				break;
+			case "Hunter":
+				attack = 8;
+				defense = 20;
+				break;
+			case "Priest":
+				attack = 4;
+				defense = 10;
+				break;
+		}
+
 		try {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero);
 			preparedStatement.setString(1, heroName);
-			preparedStatement.setInt(2, 1);
-			preparedStatement.setInt(3, 1);
-			preparedStatement.setInt(4, 1);
-			preparedStatement.setInt(5, 1);
-			preparedStatement.setInt(6, 1);
+			preparedStatement.setString(2, this.heroClass);
+			preparedStatement.setInt(3, attack);
+			preparedStatement.setInt(4, defense);
+			preparedStatement.setInt(5, hitpoints);
+			preparedStatement.setInt(6, 0);
+			preparedStatement.setInt(7, 0);
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
 		} catch (SQLException sqlException) {

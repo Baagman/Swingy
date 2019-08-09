@@ -14,9 +14,12 @@ package za.com.wethinkcode.contoller.console;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 import lombok.Getter;
 import lombok.Setter;
+import za.com.wethinkcode.Exceptions.InvalidHero;
 import za.com.wethinkcode.contoller.IController;
 import za.com.wethinkcode.model.characters.Hero;
 import za.com.wethinkcode.model.coordinates.Coordinates;
@@ -36,7 +39,7 @@ public class ConsoleController implements IController {
 		this.database = database;
 	}
 
-	public void PlayerInit() throws SQLException {
+	public void PlayerInit() throws SQLException, InvalidHero {
 
 		boolean quitGame = true;
 		this.scanner = new Scanner(System.in);
@@ -45,6 +48,7 @@ public class ConsoleController implements IController {
 		while (quitGame) {
 			consoleView.DisplayOptions("Player Selection");
 			String userInput = scanner.nextLine();
+
 			switch (userInput) {
 				case "0":
 					quitGame = false;
@@ -57,15 +61,36 @@ public class ConsoleController implements IController {
 						if (getHero() != null) {
 							quitGame = GameInit();
 						} else
-							throw new SQLException("No Such Hero");
-					} else
+							throw new InvalidHero("No Such Hero");
+					} else {
 						System.out.println("No Heroes available...Please Create A New Hero..");
+						System.out.println("-----------------------");
+					}
 					break;
 				case "2":
+					String heroclass;
+					consoleView.DisplayOptions("selecting hero class");
+					userInput = scanner.nextLine();
+					heroclass = getClassHeroTyoe(userInput);
+					if (heroclass != null) {
+						database.setHeroClass(heroclass);
+					} else
+						throw new InvalidHero("Unknown Hero Class");
 					System.out.print("To Create A New Hero Enter the Hero's name: ");
 					userInput = scanner.nextLine();
-					database.addNewHeroToTable(userInput);
+					if (checkIfHeroNameExist(userInput)) {
+						setHero(createHero(database.selectHero(userInput)));
+						getHero().setHeroClass(userInput);
+						quitGame = GameInit();
+						break;
+					} else {
+						System.out.println("Hero Name Already Exists...Please Try Other Options");
+						System.out.println("-----------------------");
+					}
 					break;
+				default:
+					System.out.println("Invalid Input Please Try Again");
+					System.out.println("-----------------------");
 			}
 		}
 		scanner.close();
@@ -114,6 +139,7 @@ public class ConsoleController implements IController {
 		playerPosition = getConsoleView().getMapSize() / 2;
 		getHero().setPosition(new Coordinates(playerPosition, playerPosition));
 		getConsoleView().setHero(getHero());
+		String[] movements = {"1", "2", "3", "4"};
 
 		while (true) {
 			String userInput;
@@ -122,10 +148,37 @@ public class ConsoleController implements IController {
 			userInput = getScanner().nextLine();
 			if (userInput.equals("0"))
 				break;
-			else {
+			else if (Arrays.asList(movements).contains(userInput)){
 				Move(userInput, getConsoleView().getMapSize());
+			}
+			else {
+				System.out.println("Invalid Input Please Try Again");
+				System.out.println("-----------------------");
 			}
 		}
 		return false;
+	}
+
+	private String getClassHeroTyoe(String index) {
+		HashMap<String, String> heroClass = new HashMap<>();
+		heroClass.put("1", "Warrior");
+		heroClass.put("2", "Hunter");
+		heroClass.put("3", "Priest");
+		return heroClass.get(index);
+	}
+
+	private boolean checkIfHeroNameExist(String heroName) throws SQLException {
+
+		boolean isExist = true;
+		if ((heroName != null) && (!heroName.isEmpty())) {
+			ResultSet resultSet =  database.selectHero(heroName);
+			if ((resultSet != null) && (resultSet.next()))
+				isExist = false;
+			else {
+				database.addNewHeroToTable(heroName);
+			}
+		} else
+			isExist = false;
+		return isExist;
 	}
 }

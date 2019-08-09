@@ -1,26 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   IController.java                                   :+:      :+:    :+:   */
+/*   InvalidHero.java                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/08/08 14:28:08 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/08/08 14:28:09 by tbaagman         ###   ########.fr       */
+/*   Created: 2019/08/09 12:59:00 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/08/09 12:59:03 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode.contoller;
+package za.com.wethinkcode.Exceptions;
 
-import za.com.wethinkcode.Exceptions.InvalidHero;
-import za.com.wethinkcode.model.characters.Hero;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-public interface IController {
-
-	void PlayerInit() throws SQLException, InvalidHero;
-	void Move(String direction, int sizeOfMap);
-	Hero createHero(ResultSet resultSet) throws SQLException;
-	boolean GameInit();
+public class InvalidHero  extends  Exception {
+	public InvalidHero(String message) {
+		super(message);
+	}
 }

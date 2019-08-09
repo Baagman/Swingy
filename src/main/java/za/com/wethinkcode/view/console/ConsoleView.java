@@ -62,7 +62,6 @@ public class ConsoleView {
 				System.out.println("2 - Create new Hero");
 				break;
 			case "selecting hero class":
-				System.out.println("0 - Exit");
 				System.out.println("1 - Warrior");
 				System.out.println("2 - Hunter");
 				System.out.println("3 - Priest");
@@ -79,6 +78,7 @@ public class ConsoleView {
 					++id;
 					System.out.println("Id: " + id);
 					System.out.println("Name: " + resultSet.getString("name"));
+					System.out.println("Hero Class: " + resultSet.getString("heroclass"));
 					System.out.println("Attack: " + resultSet.getInt("attack"));
 					System.out.println("Defense: " + resultSet.getInt("defense"));
 					System.out.println("Hit points: " + resultSet.getInt("hitpoints"));

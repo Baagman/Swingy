@@ -12,6 +12,7 @@
 
 package za.com.wethinkcode;
 
+import za.com.wethinkcode.Exceptions.InvalidHero;
 import za.com.wethinkcode.contoller.console.ConsoleController;
 import za.com.wethinkcode.model.util.Database;
 
@@ -24,9 +25,9 @@ public class Swingy {
 			try {
 				ConsoleController controller = new ConsoleController(new Database());
 				controller.PlayerInit();
-			} catch (SQLException | ClassNotFoundException | NullPointerException sqlException) {
+			} catch (SQLException | ClassNotFoundException | NullPointerException | InvalidHero Exception) {
 				System.out.print("Error: ");
-				System.out.println(sqlException.getMessage());
+				System.out.println(Exception.getMessage());
 			}
 		}
 	}
