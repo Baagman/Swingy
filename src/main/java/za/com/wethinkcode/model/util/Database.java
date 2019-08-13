@@ -50,6 +50,8 @@ public class Database {
 		StringBuilder sqlCreateTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS HEROES (\n");
 		sqlCreateTable.append(" name TEXT NOT NULL, \n");
 		sqlCreateTable.append(" heroclass TEXT NOT NULL, \n");
+		sqlCreateTable.append(" armor TEXT, \n");
+		sqlCreateTable.append(" weapon TEXT, \n");
 		sqlCreateTable.append(" attack INTEGER, \n");
 		sqlCreateTable.append(" defense INTEGER, \n");
 		sqlCreateTable.append(" hitpoints INTEGER, \n");
@@ -63,7 +65,7 @@ public class Database {
 
 	public void addNewHeroToTable(String heroName) throws SQLException {
 
-		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?, ?)";
+		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		int attack = 0;
 		int defense = 0;
 		int hitpoints = 3;
@@ -87,11 +89,13 @@ public class Database {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero);
 			preparedStatement.setString(1, heroName);
 			preparedStatement.setString(2, this.heroClass);
-			preparedStatement.setInt(3, attack);
-			preparedStatement.setInt(4, defense);
-			preparedStatement.setInt(5, hitpoints);
-			preparedStatement.setInt(6, 0);
-			preparedStatement.setInt(7, 0);
+			preparedStatement.setString(3, null);
+			preparedStatement.setString(4, null);
+			preparedStatement.setInt(5, attack);
+			preparedStatement.setInt(6, defense);
+			preparedStatement.setInt(7, hitpoints);
+			preparedStatement.setInt(8, 1);
+			preparedStatement.setInt(9, 1000);
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
 		} catch (SQLException sqlException) {
