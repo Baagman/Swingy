@@ -22,7 +22,7 @@ import za.com.wethinkcode.model.coordinates.Coordinates;
 
 @Getter
 @Setter
-public class Hero extends Characters {
+public abstract class Hero extends Characters {
 
 	private String 		heroClass;
 	private int 		level;
@@ -33,7 +33,7 @@ public class Hero extends Characters {
 	private Armor		armor;
 	private Helm		helm;
 
-	public Hero(String name, int attack, int defense, int hitPoints, int level, int xp) {
+	protected Hero(String name, int attack, int defense, int hitPoints, int level, int xp) {
 		super(name, attack, defense, hitPoints);
 		setXp(xp);
 		setLevel(level);
@@ -74,8 +74,7 @@ public class Hero extends Characters {
 
 		levelingUPXp = this.level*1000 + (int)Math.pow(this.level - 1, 2) * 450;
 		if (getXp() >= levelingUPXp) {
-			// TODO: Implement A Leveling Up method
-			// TODO: Implement A Method that will update the map when the player levels up
+			level = level + 1;
 		}
 	}
 }

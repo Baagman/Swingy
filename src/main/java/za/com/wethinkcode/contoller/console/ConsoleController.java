@@ -22,6 +22,9 @@ import lombok.Setter;
 import za.com.wethinkcode.Exceptions.InvalidHero;
 import za.com.wethinkcode.contoller.IController;
 import za.com.wethinkcode.model.characters.Hero;
+import za.com.wethinkcode.model.characters.Hunter;
+import za.com.wethinkcode.model.characters.Priest;
+import za.com.wethinkcode.model.characters.Warrior;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
@@ -59,6 +62,7 @@ public class ConsoleController implements IController {
 						userInput = scanner.nextLine();
 						setHero(createHero(database.selectHero(userInput)));
 						if (getHero() != null) {
+
 							quitGame = GameInit();
 						} else
 							throw new InvalidHero("No Such Hero");
@@ -80,9 +84,11 @@ public class ConsoleController implements IController {
 					userInput = scanner.nextLine();
 					if (checkIfHeroNameExist(userInput)) {
 						setHero(createHero(database.selectHero(userInput)));
-						getHero().setHeroClass(userInput);
-						quitGame = GameInit();
-						break;
+						if (this.hero != null) {
+							getHero().setHeroClass(heroclass);
+							quitGame = GameInit();
+						} else
+							throw new InvalidHero("Cannot Create New Hero");
 					} else {
 						System.out.println("Hero Name Already Exists...Please Try Other Options");
 						System.out.println("-----------------------");
@@ -120,13 +126,31 @@ public class ConsoleController implements IController {
 	}
 
 	public Hero createHero(ResultSet resultSet) throws SQLException {
+		String heroclass;
 		if ((resultSet != null) && (resultSet.next())) {
-			return new Hero(resultSet.getString("name"),
-					resultSet.getInt("attack"),
-					resultSet.getInt("defense"),
-					resultSet.getInt("hitpoints"),
-					resultSet.getInt("level"),
-					resultSet.getInt("experience"));
+			heroclass = resultSet.getString("heroclass");
+			if (heroclass.equalsIgnoreCase("Warrior")) {
+				return new Warrior(resultSet.getString("name"),
+						resultSet.getInt("attack"),
+						resultSet.getInt("defense"),
+						resultSet.getInt("hitpoints"),
+						resultSet.getInt("level"),
+						resultSet.getInt("experience"));
+			} else if (heroclass.equalsIgnoreCase("Hunter")) {
+				return  new Hunter(resultSet.getString("name"),
+						resultSet.getInt("attack"),
+						resultSet.getInt("defense"),
+						resultSet.getInt("hitpoints"),
+						resultSet.getInt("level"),
+						resultSet.getInt("experience"));
+			} else if (heroclass.equalsIgnoreCase("Priest")) {
+				return  new Priest(resultSet.getString("name"),
+						resultSet.getInt("attack"),
+						resultSet.getInt("defense"),
+						resultSet.getInt("hitpoints"),
+						resultSet.getInt("level"),
+						resultSet.getInt("experience"));
+			}
 		}
 		return null;
 	}
