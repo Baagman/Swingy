@@ -22,7 +22,6 @@ import java.sql.Statement;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import za.com.wethinkcode.model.characters.Hero;
 
 @Getter
 @Setter
