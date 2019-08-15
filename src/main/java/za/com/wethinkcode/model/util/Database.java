@@ -89,8 +89,8 @@ public class Database {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero);
 			preparedStatement.setString(1, heroName);
 			preparedStatement.setString(2, this.heroClass);
-			preparedStatement.setString(3, null);
-			preparedStatement.setString(4, null);
+			preparedStatement.setString(3, "none");
+			preparedStatement.setString(4, "none");
 			preparedStatement.setInt(5, attack);
 			preparedStatement.setInt(6, defense);
 			preparedStatement.setInt(7, hitpoints);
