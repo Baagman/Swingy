@@ -17,8 +17,10 @@ import lombok.Setter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.validation.constraints.NotNull;
 import za.com.wethinkcode.model.characters.Hero;
+import za.com.wethinkcode.model.characters.Villain;
 
 @Getter
 @Setter
@@ -29,13 +31,15 @@ public class ConsoleView {
 	private String[][] 	map;
 	private int 		mapSize;
 
-	public void printAndUpdateMap() {
+	public void printAndUpdateMap(ArrayList<Villain> villains) {
 
 		setMap(new String[this.mapSize][this.mapSize]);
 		for (int y = 0; y < this.mapSize; y++) {
 			for (int x = 0; x < this.mapSize; x++) {
 				if ((x == getHero().getPosition().getX()) && (y == getHero().getPosition().getY())) {
 					this.map[y][x] = "H";
+				} else if (getVillainsToDisplay(villains, x, y)) {
+					this.map[y][x] = "E";
 				} else {
 					this.map[y][x] = ".";
 				}
@@ -79,6 +83,8 @@ public class ConsoleView {
 					System.out.println("Id: " + id);
 					System.out.println("Name: " + resultSet.getString("name"));
 					System.out.println("Hero Class: " + resultSet.getString("heroclass"));
+					System.out.println("Armor: " + resultSet.getString("armor"));
+					System.out.println("Weapon: " + resultSet.getString("weapon"));
 					System.out.println("Attack: " + resultSet.getInt("attack"));
 					System.out.println("Defense: " + resultSet.getInt("defense"));
 					System.out.println("Hit points: " + resultSet.getInt("hitpoints"));
@@ -93,5 +99,16 @@ public class ConsoleView {
 			}
 		}
 		return id;
+	}
+
+	private boolean getVillainsToDisplay(ArrayList<Villain> villains, int x, int y) {
+		// TODO -- THIS NEEDS Fixing...
+		for (Villain villain : villains) {
+			if (villain.getPosition().getY() == y) {
+				if (villain.getPosition().getX() == x)
+				return true;
+			}
+		}
+		return false;
 	}
 }

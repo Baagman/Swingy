@@ -1,28 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   GamePlay.java                                      :+:      :+:    :+:   */
+/*   Villain.java                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbaagman <tbaagman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/08/08 11:35:34 by tbaagman          #+#    #+#             */
-/*   Updated: 2019/08/08 11:35:37 by tbaagman         ###   ########.fr       */
+/*   Created: 2019/07/17 16:50:19 by tbaagman          #+#    #+#             */
+/*   Updated: 2019/07/18 10:13:27 by tbaagman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-package za.com.wethinkcode.contoller;
+package za.com.wethinkcode.model.characters;
 
 import lombok.Getter;
 import lombok.Setter;
-import za.com.wethinkcode.model.characters.Hero;
+import za.com.wethinkcode.model.artefacts.Artefact;
 
 @Getter
 @Setter
-public class GamePlay {
+public class Villain extends Characters {
 
-	private Hero hero;
-
-	public GamePlay(Hero hero) {
-		this.hero = hero;
+	private Artefact artefact;
+	
+	public Villain(String name, int attack, int defense, int hitPoints, Artefact artifact) {
+		super(name, attack, defense, hitPoints);
+		this.artefact = artifact;
 	}
 }
