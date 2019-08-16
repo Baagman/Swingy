@@ -38,6 +38,7 @@ public class Controller {
 	@Setter(AccessLevel.NONE)
 	private static boolean quitGame = true;
 	private static boolean consoleViewMode;
+	private ArrayList<Villain> villains;
 
 	public Controller(Database database) {
 		this.database = database;
@@ -84,7 +85,7 @@ public class Controller {
 				String heroclass;
 				consoleView.DisplayOptions("selecting hero class");
 				userInput = scanner.nextLine();
-				heroclass = getClassHeroTyoe(userInput);
+				heroclass = getClassHeroType(userInput);
 				if (heroclass != null) {
 					database.setHeroClass(heroclass);
 				} else
@@ -110,7 +111,6 @@ public class Controller {
 	}
 
 	private void Move(String direction, int sizeOfMap) {
-
 
 		switch (direction) {
 			case "1":
@@ -184,7 +184,14 @@ public class Controller {
 				if (userInput.equals("0"))
 					break;
 				else if (Arrays.asList(movements).contains(userInput)) {
-					Move(userInput, getConsoleView().getMapSize());
+					if (checkForEnemies(userInput, getHero().getPosition().getX(), getHero().getPosition().getY())) {
+						Move(userInput, getConsoleView().getMapSize());
+						getConsoleView().printAndUpdateMap(villains);
+						getConsoleView().DisplayOptions("enemy ahead");
+						getScanner().nextLine();
+					}
+					else
+						Move(userInput, getConsoleView().getMapSize());
 				} else {
 					System.out.println("Invalid Input Please Try Again");
 					System.out.println("-----------------------");
@@ -194,7 +201,28 @@ public class Controller {
 		return false;
 	}
 
-	private String getClassHeroTyoe(String index) {
+	private boolean checkForEnemies(String userInput, int coordX, int coordY) {
+
+		boolean enemyFound;
+		switch (userInput) {
+			case "1":
+				coordY--;
+				break;
+			case "2":
+				coordX++;
+				break;
+			case "3":
+				coordY++;
+				break;
+			case "4":
+				coordX--;
+				break;
+		}
+		enemyFound = consoleView.getVillainsToDisplay(villains, coordX, coordY);
+		return enemyFound;
+	}
+
+	private String getClassHeroType(String index) {
 		HashMap<String, String> heroClass = new HashMap<>();
 		heroClass.put("1", "Warrior");
 		heroClass.put("2", "Hunter");
@@ -209,32 +237,35 @@ public class Controller {
 			ResultSet resultSet =  database.selectHero(heroName);
 			if ((resultSet != null) && (resultSet.next()))
 				isExist = false;
-			else {
+			else
 				database.addNewHeroToTable(heroName);
-			}
 		} else
 			isExist = false;
 		return isExist;
 	}
 
-	private ArrayList<Villain> generateVillains(int mapsize) {
+	private ArrayList<Villain> generateVillains(int mapSize) {
 
 		ArrayList<Villain> villains = new ArrayList<>();
 		int position;
-		// TODO -- FIX this villain generating algorithm
-		for (int y = 1; y < mapsize * 2; y++) {
-			position = ThreadLocalRandom.current().nextInt(0, mapsize + 1);
+		int x = 0;
+		for (int y = 0; y <= mapSize * 2; y++) {
+			position = ThreadLocalRandom.current().nextInt(0, mapSize);
 			if ((getHero().getPosition().getX() != position) || (getHero().getPosition().getY() != y)) {
 				Villain villain = new Villain("Elf", 1, 1, 1, null);
-				villain.setPosition(new Coordinates(position, y));
-				villains.add(villain);
-			}
-			if ((getHero().getPosition().getX() != position) || (getHero().getPosition().getY() != y)) {
-				Villain villain = new Villain("Elf", 1, 1, 1, null);
-				villain.setPosition(new Coordinates(position, mapsize));
-				villains.add(villain);
+				if (y > mapSize) {
+					if ((getHero().getPosition().getX() != position) || (getHero().getPosition().getY() != x)) {
+						villain.setPosition(new Coordinates(position, x));
+						villains.add(villain);
+					}
+					x++;
+				} else {
+					villain.setPosition(new Coordinates(position, y));
+					villains.add(villain);
+				}
 			}
 		}
+		setVillains(villains);
 		return villains;
 	}
 }

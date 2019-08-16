@@ -32,7 +32,6 @@ public class ConsoleView {
 	private int 		mapSize;
 
 	public void printAndUpdateMap(ArrayList<Villain> villains) {
-
 		setMap(new String[this.mapSize][this.mapSize]);
 		for (int y = 0; y < this.mapSize; y++) {
 			for (int x = 0; x < this.mapSize; x++) {
@@ -69,6 +68,10 @@ public class ConsoleView {
 				System.out.println("1 - Warrior");
 				System.out.println("2 - Hunter");
 				System.out.println("3 - Priest");
+				break;
+			case "enemy ahead":
+				System.out.println("1 - Run");
+				System.out.println("2 - Fight");
 		}
 		System.out.println("-----------------------");
 		System.out.print("Please Input Option: ");
@@ -101,8 +104,7 @@ public class ConsoleView {
 		return id;
 	}
 
-	private boolean getVillainsToDisplay(ArrayList<Villain> villains, int x, int y) {
-		// TODO -- THIS NEEDS Fixing...
+	public boolean getVillainsToDisplay(ArrayList<Villain> villains, int x, int y) {
 		for (Villain villain : villains) {
 			if (villain.getPosition().getY() == y) {
 				if (villain.getPosition().getX() == x)
