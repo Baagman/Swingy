@@ -121,11 +121,11 @@ public class Controller {
 				if (getHero().getPosition().getX() < sizeOfMap - 1)
 					getHero().getPosition().setX(getHero().getPosition().getX() + 1);
 				break;
-			case "3":
+			case "4":
 				if (getHero().getPosition().getY() < (sizeOfMap - 1))
 					getHero().getPosition().setY(getHero().getPosition().getY() + 1);
 				break;
-			case "4":
+			case "3":
 				if (getHero().getPosition().getX() > 0)
 					getHero().getPosition().setX(getHero().getPosition().getX() - 1);
 				break;
@@ -184,11 +184,26 @@ public class Controller {
 				if (userInput.equals("0"))
 					break;
 				else if (Arrays.asList(movements).contains(userInput)) {
-					if (checkForEnemies(userInput, getHero().getPosition().getX(), getHero().getPosition().getY())) {
+					Villain villain = checkForEnemies(userInput, getHero().getPosition().getX(), getHero().getPosition().getY());
+					if (villain != null) {
+						Coordinates previousPosition = new Coordinates(getHero().getPosition().getX(), getHero().getPosition().getY());
 						Move(userInput, getConsoleView().getMapSize());
 						getConsoleView().printAndUpdateMap(villains);
 						getConsoleView().DisplayOptions("enemy ahead");
-						getScanner().nextLine();
+						userInput = getScanner().nextLine();
+						if (userInput.equals("1")) {
+							getHero().Run(previousPosition);
+						} else if (userInput.equals("2")) {
+							if (simulateFight(villain)) {
+								villains.remove(villain);
+								System.out.println("You Won The Battle");
+								System.out.println("-----------------------");
+							} else {
+								System.out.println("You Lost...\nGame Over");
+								System.out.println("-----------------------");
+								return false;
+							}
+						}
 					}
 					else
 						Move(userInput, getConsoleView().getMapSize());
@@ -201,25 +216,29 @@ public class Controller {
 		return false;
 	}
 
-	private boolean checkForEnemies(String userInput, int coordX, int coordY) {
+	private Villain checkForEnemies(String userInput, int coordsX, int coordsY) {
 
-		boolean enemyFound;
 		switch (userInput) {
 			case "1":
-				coordY--;
+				coordsY--;
 				break;
 			case "2":
-				coordX++;
-				break;
-			case "3":
-				coordY++;
+				coordsX++;
 				break;
 			case "4":
-				coordX--;
+				coordsY++;
+				break;
+			case "3":
+				coordsX--;
 				break;
 		}
-		enemyFound = consoleView.getVillainsToDisplay(villains, coordX, coordY);
-		return enemyFound;
+		for (Villain villain : villains) {
+			if (villain.getPosition().getY() == coordsY) {
+				if (villain.getPosition().getX() == coordsX)
+					return villain;
+			}
+		}
+		return null;
 	}
 
 	private String getClassHeroType(String index) {
@@ -252,7 +271,7 @@ public class Controller {
 		for (int y = 0; y <= mapSize * 2; y++) {
 			position = ThreadLocalRandom.current().nextInt(0, mapSize);
 			if ((getHero().getPosition().getX() != position) || (getHero().getPosition().getY() != y)) {
-				Villain villain = new Villain("Elf", 1, 1, 1, null);
+				Villain villain = new Villain("Elf", 10, 1, 3, null);
 				if (y > mapSize) {
 					if ((getHero().getPosition().getX() != position) || (getHero().getPosition().getY() != x)) {
 						villain.setPosition(new Coordinates(position, x));
@@ -267,5 +286,23 @@ public class Controller {
 		}
 		setVillains(villains);
 		return villains;
+	}
+
+	private boolean simulateFight(Villain villain) {
+		Random random = new Random();
+		while ((getHero().getHitPoints() > 0) && (villain.getHitPoints() > 0)) {
+			int heroAction = random.nextInt(2);
+			int villainAction = random.nextInt(2);
+			int damageTaken;
+
+			if ((heroAction == 1) && (villainAction == 1)) {
+				getHero().setHitPoints(getHero().getHitPoints() - villain.getAttack());
+				villain.setHitPoints(getHero().getHitPoints() - getHero().getAttack());
+			} else if ((heroAction == 1) && (villainAction == 0)) {
+				damageTaken = Math.max((getHero().getAttack() - villain.getDefense()), 0);
+				villain.setHitPoints(villain.getHitPoints() - damageTaken);
+			}
+		}
+		return getHero().getHitPoints() > 0;
 	}
 }

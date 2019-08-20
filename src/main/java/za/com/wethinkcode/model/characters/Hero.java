@@ -25,17 +25,17 @@ import za.com.wethinkcode.model.coordinates.Coordinates;
 public abstract class Hero extends Characters {
 
 	private String 		heroClass;
-	private int 		level;
-	private int			xp;
+	private int			level;
+	private int experience;
 
 	@Setter(AccessLevel.NONE)
 	private Weapon		weapon;
 	private Armor		armor;
 	private Helm		helm;
 
-	protected Hero(String name, int attack, int defense, int hitPoints, int level, int xp) {
+	Hero(String name, int attack, int defense, int hitPoints, int level, int experience) {
 		super(name, attack, defense, hitPoints);
-		setXp(xp);
+		setExperience(experience);
 		setLevel(level);
 	}
 
@@ -70,11 +70,15 @@ public abstract class Hero extends Characters {
 
 	public void AddExperience(int addXp) {
 		int levelingUPXp;
-		this.xp += addXp;
+		this.experience += addXp;
 
 		levelingUPXp = this.level*1000 + (int)Math.pow(this.level - 1, 2) * 450;
-		if (getXp() >= levelingUPXp) {
+		if (getExperience() >= levelingUPXp) {
 			level = level + 1;
 		}
+	}
+
+	public void Run(Coordinates previousPosition) {
+		this.position = previousPosition;
 	}
 }
