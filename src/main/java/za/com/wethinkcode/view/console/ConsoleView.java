@@ -56,8 +56,8 @@ public class ConsoleView {
 				System.out.println("0 - Exit");
 				System.out.println("1 - North");
 				System.out.println("2 - East");
-				System.out.println("3 - South");
-				System.out.println("4 - West");
+				System.out.println("3 - West");
+				System.out.println("4 - South");
 				break;
 			case "player selection":
 				System.out.println("0 - Exit");
