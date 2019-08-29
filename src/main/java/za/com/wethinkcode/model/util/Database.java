@@ -22,6 +22,7 @@ import java.sql.Statement;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import za.com.wethinkcode.model.characters.Hero;
 
 @Getter
 @Setter
@@ -52,6 +53,7 @@ public class Database {
 		sqlCreateTable.append(" heroclass TEXT NOT NULL, \n");
 		sqlCreateTable.append(" armor TEXT, \n");
 		sqlCreateTable.append(" weapon TEXT, \n");
+		sqlCreateTable.append(" helm TEXT, \n");
 		sqlCreateTable.append(" attack INTEGER, \n");
 		sqlCreateTable.append(" defense INTEGER, \n");
 		sqlCreateTable.append(" hitpoints INTEGER, \n");
@@ -65,10 +67,10 @@ public class Database {
 
 	public void addNewHeroToTable(String heroName) throws SQLException {
 
-		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		int attack = 0;
 		int defense = 0;
-		int hitpoints = 3;
+		int hitpoints = 12;
 
 		switch (this.heroClass) {
 			case "Warrior":
@@ -89,13 +91,14 @@ public class Database {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero);
 			preparedStatement.setString(1, heroName);
 			preparedStatement.setString(2, this.heroClass);
-			preparedStatement.setString(3, "none");
-			preparedStatement.setString(4, "none");
-			preparedStatement.setInt(5, attack);
-			preparedStatement.setInt(6, defense);
-			preparedStatement.setInt(7, hitpoints);
-			preparedStatement.setInt(8, 1);
-			preparedStatement.setInt(9, 1000);
+			preparedStatement.setString(3, null);
+			preparedStatement.setString(4, null);
+			preparedStatement.setString(5, null);
+			preparedStatement.setInt(6, attack);
+			preparedStatement.setInt(7, defense);
+			preparedStatement.setInt(8, hitpoints);
+			preparedStatement.setInt(9, 1);
+			preparedStatement.setInt(10, 1000);
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
 		} catch (SQLException sqlException) {
@@ -126,5 +129,26 @@ public class Database {
 			throw new SQLException("Unable to connect to database: " + sqlException.getMessage());
 		}
 		return resultSet;
+	}
+
+	public void updateHero(Hero hero) throws SQLException {
+		StringBuilder sqlUpdate = new StringBuilder("UPDATE HEROES SET armor = ?, weapon = ?, helm = ?, attack = ?,");
+		sqlUpdate.append(" defense = ?, hitpoints = ?, level = ?, experience = ? WHERE name = ?;");
+		try {
+			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlUpdate.toString());
+			preparedStatement.setString(1, hero.getArmor().getName());
+			preparedStatement.setString(2, hero.getWeapon().getName());
+			preparedStatement.setString(3, hero.getHelm().getName());
+			preparedStatement.setInt(4,hero.getAttack());
+			preparedStatement.setInt(5,hero.getDefense());
+			preparedStatement.setInt(6,hero.getHitPoints());
+			preparedStatement.setInt(7,hero.getLevel());
+			preparedStatement.setInt(8, hero.getExperience());
+			preparedStatement.setString(9, hero.getName());
+			preparedStatement.executeUpdate();
+			preparedStatement.close();
+		} catch (SQLException sqlException) {
+			throw new SQLException("Unable to Update hero stats in the database: " + sqlException.getMessage());
+		}
 	}
 }

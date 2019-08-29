@@ -72,7 +72,7 @@ public class Controller {
 					System.out.print("Please Select A Hero By Entering Their Name: ");
 					userInput = scanner.nextLine();
 					setHero(createHero(database.selectHero(userInput)));
-					if (getHero() != null) {
+					if (hero != null) {
 						quitGame = GameInit();
 					} else
 						throw new InvalidHero("No Such Hero");
@@ -95,7 +95,7 @@ public class Controller {
 				if (checkIfHeroNameExist(userInput)) {
 					setHero(createHero(database.selectHero(userInput)));
 					if (this.hero != null) {
-						getHero().setHeroClass(heroclass);
+						hero.setHeroClass(heroclass);
 						quitGame = GameInit();
 					} else
 						throw new InvalidHero("Cannot Create New Hero");
@@ -114,20 +114,20 @@ public class Controller {
 
 		switch (direction) {
 			case "1":
-				if (getHero().getPosition().getY() > 0)
-					getHero().getPosition().setY(getHero().getPosition().getY() - 1);
+				if (hero.getPosition().getY() > 0)
+					hero.getPosition().setY(hero.getPosition().getY() - 1);
 				break;
 			case "2":
-				if (getHero().getPosition().getX() < sizeOfMap - 1)
-					getHero().getPosition().setX(getHero().getPosition().getX() + 1);
+				if (hero.getPosition().getX() < sizeOfMap - 1)
+					hero.getPosition().setX(hero.getPosition().getX() + 1);
 				break;
 			case "4":
-				if (getHero().getPosition().getY() < (sizeOfMap - 1))
-					getHero().getPosition().setY(getHero().getPosition().getY() + 1);
+				if (hero.getPosition().getY() < (sizeOfMap - 1))
+					hero.getPosition().setY(hero.getPosition().getY() + 1);
 				break;
 			case "3":
-				if (getHero().getPosition().getX() > 0)
-					getHero().getPosition().setX(getHero().getPosition().getX() - 1);
+				if (hero.getPosition().getX() > 0)
+					hero.getPosition().setX(hero.getPosition().getX() - 1);
 				break;
 		}
 	}
@@ -162,19 +162,18 @@ public class Controller {
 		return null;
 	}
 
-	private boolean GameInit() {
+	private boolean GameInit() throws SQLException {
 
 		int playerPosition;
 		String[] movements = {"1", "2", "3", "4"};
-		ArrayList<Villain> villains;
 
 		if (consoleViewMode) {
-			getConsoleView().setMapSize((getHero().getLevel() - 1) * 5 + 10 - (getHero().getLevel() % 2));
+			getConsoleView().setMapSize((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
 			playerPosition = getConsoleView().getMapSize() / 2;
-			getHero().setPosition(new Coordinates(playerPosition, playerPosition));
-			getConsoleView().setHero(getHero());
+			hero.setPosition(new Coordinates(playerPosition, playerPosition));
+			getConsoleView().setHero(hero);
 		}
-		villains = generateVillains((getHero().getLevel() - 1) * 5 + 10 - (getHero().getLevel() % 2));
+		villains = generateVillains((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
 		while (true) {
 			if (consoleViewMode) {
 				String userInput;
@@ -184,15 +183,15 @@ public class Controller {
 				if (userInput.equals("0"))
 					break;
 				else if (Arrays.asList(movements).contains(userInput)) {
-					Villain villain = checkForEnemies(userInput, getHero().getPosition().getX(), getHero().getPosition().getY());
+					Villain villain = checkForEnemies(userInput, hero.getPosition().getX(), hero.getPosition().getY());
 					if (villain != null) {
-						Coordinates previousPosition = new Coordinates(getHero().getPosition().getX(), getHero().getPosition().getY());
+						Coordinates previousPosition = new Coordinates(hero.getPosition().getX(), hero.getPosition().getY());
 						Move(userInput, getConsoleView().getMapSize());
 						getConsoleView().printAndUpdateMap(villains);
 						getConsoleView().DisplayOptions("enemy ahead");
 						userInput = getScanner().nextLine();
 						if (userInput.equals("1")) {
-							getHero().Run(previousPosition);
+							hero.Run(previousPosition);
 						} else if (userInput.equals("2")) {
 							if (simulateFight(villain)) {
 								villains.remove(villain);
@@ -270,17 +269,19 @@ public class Controller {
 		int x = 0;
 		for (int y = 0; y <= mapSize * 2; y++) {
 			position = ThreadLocalRandom.current().nextInt(0, mapSize);
-			if ((getHero().getPosition().getX() != position) || (getHero().getPosition().getY() != y)) {
-				Villain villain = new Villain("Elf", 10, 1, 3, null);
-				if (y > mapSize) {
-					if ((getHero().getPosition().getX() != position) || (getHero().getPosition().getY() != x)) {
-						villain.setPosition(new Coordinates(position, x));
+			if ((hero.getPosition().getX() != position) || (hero.getPosition().getY() != y)) {
+				Villain villain = getVillainType();
+				if (villain != null) {
+					if (y > mapSize) {
+						if ((hero.getPosition().getX() != position) || (hero.getPosition().getY() != x)) {
+							villain.setPosition(new Coordinates(position, x));
+							villains.add(villain);
+						}
+						x++;
+					} else {
+						villain.setPosition(new Coordinates(position, y));
 						villains.add(villain);
 					}
-					x++;
-				} else {
-					villain.setPosition(new Coordinates(position, y));
-					villains.add(villain);
 				}
 			}
 		}
@@ -288,21 +289,64 @@ public class Controller {
 		return villains;
 	}
 
-	private boolean simulateFight(Villain villain) {
+	private boolean simulateFight(Villain villain) throws SQLException {
 		Random random = new Random();
-		while ((getHero().getHitPoints() > 0) && (villain.getHitPoints() > 0)) {
+		while ((hero.getHitPoints() > 0) && (villain.getHitPoints() > 0)) {
 			int heroAction = random.nextInt(2);
 			int villainAction = random.nextInt(2);
 			int damageTaken;
 
 			if ((heroAction == 1) && (villainAction == 1)) {
-				getHero().setHitPoints(getHero().getHitPoints() - villain.getAttack());
-				villain.setHitPoints(getHero().getHitPoints() - getHero().getAttack());
+				hero.setHitPoints(hero.getHitPoints() - villain.getAttack());
+				villain.setHitPoints(hero.getHitPoints() - hero.getAttack());
 			} else if ((heroAction == 1) && (villainAction == 0)) {
-				damageTaken = Math.max((getHero().getAttack() - villain.getDefense()), 0);
+				damageTaken = Math.max((hero.getAttack() - villain.getDefense()), 0);
 				villain.setHitPoints(villain.getHitPoints() - damageTaken);
+			} else if ((heroAction == 0) && (villainAction == 1)) {
+				damageTaken = Math.max((villain.getAttack() - hero.getDefense()), 0);
+				hero.setHitPoints(villain.getHitPoints() - damageTaken);
 			}
 		}
-		return getHero().getHitPoints() > 0;
+		if (hero.getHitPoints() > 0) {
+			int xp = villain.getAttack() + villain.getDefense();
+			addExperience(xp);
+			return true;
+		}
+		return false;
+	}
+
+	private Villain getVillainType() {
+		Random random = new Random();
+		HashMap<String, Integer> villainStats = new HashMap<>();
+		int randomNumber = random.nextInt(2);
+		int hotPoints = random.nextInt(hero.getHitPoints() + 1);
+
+		villainStats.put("Attack", random.nextInt(hero.getAttack()));
+		villainStats.put("Defense", random.nextInt(hero.getDefense()));
+		if (randomNumber == 0) {
+			return new DarkElf("Dark Elf", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints, null);
+		} else if (randomNumber == 1)
+			return new Ogre("Ogre", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints, null);
+		else
+			return null;
+	}
+
+	private void addExperience(int experience) throws SQLException {
+		if (consoleViewMode) {
+			int tempLevel = hero.getLevel() + 1;
+			int levelingUpXp = tempLevel + 1 * 1000 + (int)Math.pow((tempLevel - 1), 2) * 450;
+			hero.setExperience(hero.getExperience() + experience);
+			database.updateHero(hero);
+			int playerPosition;
+
+			if (hero.getLevel() >= levelingUpXp) {
+				hero.setLevel(hero.getLevel() + 1);
+				getConsoleView().setMapSize((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
+				playerPosition = getConsoleView().getMapSize() / 2;
+				hero.setPosition(new Coordinates(playerPosition, playerPosition));
+				villains = null;
+				villains = generateVillains((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
+			}
+		}
 	}
 }
