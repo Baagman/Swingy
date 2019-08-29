@@ -16,6 +16,8 @@ import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 abstract public class Characters {

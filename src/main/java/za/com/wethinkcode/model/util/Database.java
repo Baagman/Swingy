@@ -132,23 +132,34 @@ public class Database {
 	}
 
 	public void updateHero(Hero hero) throws SQLException {
-		StringBuilder sqlUpdate = new StringBuilder("UPDATE HEROES SET armor = ?, weapon = ?, helm = ?, attack = ?,");
-		sqlUpdate.append(" defense = ?, hitpoints = ?, level = ?, experience = ? WHERE name = ?;");
-		try {
-			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlUpdate.toString());
-			preparedStatement.setString(1, hero.getArmor().getName());
-			preparedStatement.setString(2, hero.getWeapon().getName());
-			preparedStatement.setString(3, hero.getHelm().getName());
-			preparedStatement.setInt(4,hero.getAttack());
-			preparedStatement.setInt(5,hero.getDefense());
-			preparedStatement.setInt(6,hero.getHitPoints());
-			preparedStatement.setInt(7,hero.getLevel());
-			preparedStatement.setInt(8, hero.getExperience());
-			preparedStatement.setString(9, hero.getName());
-			preparedStatement.executeUpdate();
-			preparedStatement.close();
-		} catch (SQLException sqlException) {
-			throw new SQLException("Unable to Update hero stats in the database: " + sqlException.getMessage());
+		StringBuilder sqlUpdate = new StringBuilder("UPDATE HEROES SET experience = ?, hitpoints = ?");
+		sqlUpdate.append(", attack = ?, defense = ?, armor = ?, weapon = ?, helm = ?, level = ? WHERE name = ?;");
+		if (hero != null) {
+			try {
+				PreparedStatement preparedStatement = getConnection().prepareStatement(sqlUpdate.toString());
+				preparedStatement.setInt(1, hero.getExperience());
+				preparedStatement.setInt(2, hero.getHitPoints());
+				preparedStatement.setInt(3, hero.getAttack());
+				preparedStatement.setInt(4, hero.getDefense());
+				if (hero.getArmor() != null)
+					preparedStatement.setString(5, hero.getArmor().getName());
+				else
+					preparedStatement.setString(5, null);
+				if (hero.getWeapon() != null)
+					preparedStatement.setString(6, hero.getWeapon().getName());
+				else
+					preparedStatement.setString(6, null);
+				if (hero.getHelm() != null)
+					preparedStatement.setString(7, hero.getHelm().getName());
+				else
+					preparedStatement.setString(7, null);
+				preparedStatement.setInt(8, hero.getLevel());
+				preparedStatement.setString(9, hero.getName());
+				preparedStatement.executeUpdate();
+				preparedStatement.close();
+			} catch (SQLException sqlException) {
+				throw new SQLException("Unable to Update hero stats in the database: " + sqlException.getMessage());
+			}
 		}
 	}
 }

@@ -20,10 +20,7 @@ import za.com.wethinkcode.model.artefacts.Artefact;
 @Setter
 public abstract class Villain extends Characters {
 
-	private Artefact artefact;
-
-	Villain(String name, int attack, int defense, int hitPoints, Artefact artifact) {
+	Villain(String name, int attack, int defense, int hitPoints) {
 		super(name, attack, defense, hitPoints);
-		this.artefact = artifact;
 	}
 }

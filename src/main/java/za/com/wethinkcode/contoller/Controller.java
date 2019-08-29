@@ -21,10 +21,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.Exceptions.InvalidHero;
+import za.com.wethinkcode.model.artefacts.Armor;
+import za.com.wethinkcode.model.artefacts.Artefact;
+import za.com.wethinkcode.model.artefacts.Helm;
+import za.com.wethinkcode.model.artefacts.Weapon;
 import za.com.wethinkcode.model.characters.*;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -72,10 +78,8 @@ public class Controller {
 					System.out.print("Please Select A Hero By Entering Their Name: ");
 					userInput = scanner.nextLine();
 					setHero(createHero(database.selectHero(userInput)));
-					if (hero != null) {
+					if (hero != null)
 						quitGame = GameInit();
-					} else
-						throw new InvalidHero("No Such Hero");
 				} else {
 					System.out.println("No Heroes available...Please Create A New Hero..");
 					System.out.println("-----------------------");
@@ -194,12 +198,21 @@ public class Controller {
 							hero.Run(previousPosition);
 						} else if (userInput.equals("2")) {
 							if (simulateFight(villain)) {
+								Artefact artefact = generateArtefact(villain);
+								getConsoleView().DisplayOptions("battle won");
+								userInput = getScanner().nextLine();
+								if (artefact != null) {
+									if (artefact.getName().equalsIgnoreCase("Sword"))
+										hero.equipWeapon((Weapon) artefact);
+									else if (artefact.getName().equalsIgnoreCase("Leather armor"))
+										hero.equipArmor((Armor) artefact);
+									else if (artefact.getName().equalsIgnoreCase("Health Potion"))
+										hero.equipHelm((Helm) artefact);
+								}
 								villains.remove(villain);
-								System.out.println("You Won The Battle");
-								System.out.println("-----------------------");
+								database.updateHero(hero);
 							} else {
-								System.out.println("You Lost...\nGame Over");
-								System.out.println("-----------------------");
+								getConsoleView().DisplayOptions("battle lost");
 								return false;
 							}
 						}
@@ -324,19 +337,18 @@ public class Controller {
 		villainStats.put("Attack", random.nextInt(hero.getAttack()));
 		villainStats.put("Defense", random.nextInt(hero.getDefense()));
 		if (randomNumber == 0) {
-			return new DarkElf("Dark Elf", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints, null);
+			return new DarkElf("Dark Elf", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints);
 		} else if (randomNumber == 1)
-			return new Ogre("Ogre", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints, null);
+			return new Ogre("Ogre", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints);
 		else
 			return null;
 	}
 
-	private void addExperience(int experience) throws SQLException {
+	private void addExperience(int experience) {
 		if (consoleViewMode) {
 			int tempLevel = hero.getLevel() + 1;
-			int levelingUpXp = tempLevel + 1 * 1000 + (int)Math.pow((tempLevel - 1), 2) * 450;
+			int levelingUpXp = (tempLevel * 1000) + ((int)Math.pow((tempLevel - 1), 2) * 450);
 			hero.setExperience(hero.getExperience() + experience);
-			database.updateHero(hero);
 			int playerPosition;
 
 			if (hero.getLevel() >= levelingUpXp) {
@@ -348,5 +360,19 @@ public class Controller {
 				villains = generateVillains((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
 			}
 		}
+	}
+
+	private Artefact generateArtefact(Characters character) {
+		Random random = new Random();
+		int randomNumber = random.nextInt(6);
+
+		if (randomNumber == 1)
+			return new Weapon("Sword", character.getAttack());
+		else if (randomNumber == 2)
+			return new Armor("Leather Armor", character.getDefense() + 5);
+		else if ((randomNumber == 3) || (randomNumber == 4))
+			return new Helm("Health Potion", random.nextInt(14));
+		else
+			return null;
 	}
 }

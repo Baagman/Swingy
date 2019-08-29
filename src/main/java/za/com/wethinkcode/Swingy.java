@@ -17,6 +17,7 @@ import za.com.wethinkcode.contoller.Controller;
 import za.com.wethinkcode.model.util.Database;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 
 public class Swingy {
 	public static void main(String[] args ) {
@@ -28,7 +29,7 @@ public class Swingy {
 				controller.PlayerInit(args[0]);
 			} catch (SQLException | ClassNotFoundException | NullPointerException | InvalidHero Exception) {
 				System.out.print("Error: ");
-				System.out.println(Exception.getMessage());
+				System.out.println(Arrays.toString(Exception.getStackTrace()));
 			}
 		}
 	}

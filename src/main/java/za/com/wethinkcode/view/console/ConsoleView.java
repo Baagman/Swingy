@@ -72,6 +72,13 @@ public class ConsoleView {
 			case "enemy ahead":
 				System.out.println("1 - Run");
 				System.out.println("2 - Fight");
+				break;
+			case "battle won":
+				System.out.println("You Won The Battle");
+				break;
+			case "battle lost":
+				System.out.println("You Lost...\nGame Over");
+				break;
 		}
 		System.out.println("-----------------------");
 		System.out.print("Please Input Option: ");
@@ -88,6 +95,7 @@ public class ConsoleView {
 					System.out.println("Hero Class: " + resultSet.getString("heroclass"));
 					System.out.println("Armor: " + resultSet.getString("armor"));
 					System.out.println("Weapon: " + resultSet.getString("weapon"));
+					System.out.println("Helm: " + resultSet.getString("helm"));
 					System.out.println("Attack: " + resultSet.getInt("attack"));
 					System.out.println("Defense: " + resultSet.getInt("defense"));
 					System.out.println("Hit points: " + resultSet.getInt("hitpoints"));
