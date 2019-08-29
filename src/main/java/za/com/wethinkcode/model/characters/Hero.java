@@ -44,37 +44,32 @@ public abstract class Hero extends Characters {
 		if (weapon != null) {
 			if (this.weapon != null) {
 				this.attack -= this.weapon.getPoints();
-				this.attack = getAttack() < 0 ? 0 : getAttack();
+				this.attack = Math.max(getAttack(), 0);
 			}
 			this.attack += weapon.getPoints();
-			this.weapon = weapon;
 		}
+		this.weapon = weapon;
 	}
 
 	public void equipArmor(Armor armor) {
 		if (armor != null) {
 			if (this.armor != null) {
 				this.defense -= getArmor().getPoints();
-				this.defense = getDefense() < 0 ? 0 : getDefense();
+				this.defense = Math.max(getDefense(), 0);
 			}
 			this.defense += armor.getPoints();
 			this.armor = armor;
 		}
 	}
 
-
-	// TODO: Implement A EquidHelm method
 	public void equipHelm(Helm helm) {
-
-	}
-
-	public void AddExperience(int addXp) {
-		int levelingUPXp;
-		this.experience += addXp;
-
-		levelingUPXp = this.level*1000 + (int)Math.pow(this.level - 1, 2) * 450;
-		if (getExperience() >= levelingUPXp) {
-			level = level + 1;
+		if (helm != null) {
+			if (this.helm != null) {
+				this.hitPoints -= getHelm().getPoints();
+				this.hitPoints = Math.max(getHitPoints(), 0);
+			}
+			this.hitPoints += helm.getPoints();
+			this.helm = helm;
 		}
 	}
 

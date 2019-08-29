@@ -18,11 +18,11 @@ import za.com.wethinkcode.model.artefacts.Artefact;
 
 @Getter
 @Setter
-public class Villain extends Characters {
+public abstract class Villain extends Characters {
 
 	private Artefact artefact;
-	
-	public Villain(String name, int attack, int defense, int hitPoints, Artefact artifact) {
+
+	Villain(String name, int attack, int defense, int hitPoints, Artefact artifact) {
 		super(name, attack, defense, hitPoints);
 		this.artefact = artifact;
 	}
