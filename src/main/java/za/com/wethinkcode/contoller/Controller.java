@@ -30,8 +30,6 @@ import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @Setter
 public class Controller {
@@ -45,6 +43,12 @@ public class Controller {
 	private static boolean quitGame = true;
 	private static boolean consoleViewMode;
 	private ArrayList<Villain> villains;
+	@Setter
+	@Getter
+	private HashMap<Integer, String> armor;
+	@Setter
+	@Getter
+	private HashMap<Integer, String> weapon;
 
 	public Controller(Database database) {
 		this.database = database;
@@ -66,7 +70,7 @@ public class Controller {
 
 	private void ConsoleMode() throws SQLException, InvalidHero {
 
-		consoleView.DisplayOptions("Player Selection");
+		consoleView.displayOptions("Player Selection");
 		String userInput = scanner.nextLine();
 
 		switch (userInput) {
@@ -87,7 +91,7 @@ public class Controller {
 				break;
 			case "2":
 				String heroclass;
-				consoleView.DisplayOptions("selecting hero class");
+				consoleView.displayOptions("selecting hero class");
 				userInput = scanner.nextLine();
 				heroclass = getClassHeroType(userInput);
 				if (heroclass != null) {
@@ -137,33 +141,46 @@ public class Controller {
 	}
 
 	private Hero createHero(ResultSet resultSet) throws SQLException {
-		String heroclass;
+		String heroClass;
+		Hero hero = null;
 		if ((resultSet != null) && (resultSet.next())) {
-			heroclass = resultSet.getString("heroclass");
-			if (heroclass.equalsIgnoreCase("Warrior")) {
-				return new Warrior(resultSet.getString("name"),
+			heroClass = resultSet.getString("heroClass");
+			if (heroClass.equalsIgnoreCase("Warrior")) {
+				hero = new Warrior(resultSet.getString("name"),
 						resultSet.getInt("attack"),
 						resultSet.getInt("defense"),
 						resultSet.getInt("hitpoints"),
 						resultSet.getInt("level"),
 						resultSet.getInt("experience"));
-			} else if (heroclass.equalsIgnoreCase("Hunter")) {
-				return  new Hunter(resultSet.getString("name"),
+			} else if (heroClass.equalsIgnoreCase("Hunter")) {
+				hero = new Hunter(resultSet.getString("name"),
 						resultSet.getInt("attack"),
 						resultSet.getInt("defense"),
 						resultSet.getInt("hitpoints"),
 						resultSet.getInt("level"),
 						resultSet.getInt("experience"));
-			} else if (heroclass.equalsIgnoreCase("Priest")) {
-				return  new Priest(resultSet.getString("name"),
+			} else if (heroClass.equalsIgnoreCase("Priest")) {
+				hero = new Priest(resultSet.getString("name"),
 						resultSet.getInt("attack"),
 						resultSet.getInt("defense"),
 						resultSet.getInt("hitpoints"),
 						resultSet.getInt("level"),
 						resultSet.getInt("experience"));
 			}
+
+			if (hero != null) {
+				if ((resultSet.getString("helm") != null) &&
+					(!resultSet.getString("helm").isEmpty()))
+					hero.equipHelm(generateHelm(resultSet.getString("helm"), 0));
+				if ((resultSet.getString("armor") != null) &&
+						(!resultSet.getString("armor").isEmpty()))
+					hero.equipArmor(generateArmor(resultSet.getString("armor"), 0));
+				if ((resultSet.getString("weapon") != null) &&
+						(!resultSet.getString("weapon").isEmpty()))
+						hero.equipWeapon(generateWeapon(resultSet.getString("weapon"), 0));
+			}
 		}
-		return null;
+		return hero;
 	}
 
 	private boolean GameInit() throws SQLException {
@@ -182,7 +199,7 @@ public class Controller {
 			if (consoleViewMode) {
 				String userInput;
 				getConsoleView().printAndUpdateMap(villains);
-				getConsoleView().DisplayOptions("Play");
+				getConsoleView().displayOptions("Play");
 				userInput = getScanner().nextLine();
 				if (userInput.equals("0"))
 					break;
@@ -192,27 +209,26 @@ public class Controller {
 						Coordinates previousPosition = new Coordinates(hero.getPosition().getX(), hero.getPosition().getY());
 						Move(userInput, getConsoleView().getMapSize());
 						getConsoleView().printAndUpdateMap(villains);
-						getConsoleView().DisplayOptions("enemy ahead");
+						getConsoleView().displayVillainStats(villain);
+						getConsoleView().displayOptions("enemy ahead");
 						userInput = getScanner().nextLine();
 						if (userInput.equals("1")) {
 							hero.Run(previousPosition);
 						} else if (userInput.equals("2")) {
 							if (simulateFight(villain)) {
-								Artefact artefact = generateArtefact(villain);
-								getConsoleView().DisplayOptions("battle won");
-								userInput = getScanner().nextLine();
+								getConsoleView().displayOptions("battle won");
+								Artefact artefact = generateArtifact(villain);
 								if (artefact != null) {
-									if (artefact.getName().equalsIgnoreCase("Sword"))
-										hero.equipWeapon((Weapon) artefact);
-									else if (artefact.getName().equalsIgnoreCase("Leather armor"))
-										hero.equipArmor((Armor) artefact);
-									else if (artefact.getName().equalsIgnoreCase("Health Potion"))
-										hero.equipHelm((Helm) artefact);
+									getConsoleView().displayArtefactStats(villain, artefact);
+									getConsoleView().displayOptions("artefact dropped");
+									userInput = getScanner().nextLine();
+									if (userInput.equals("1"))
+										Equip(artefact);
 								}
 								villains.remove(villain);
 								database.updateHero(hero);
 							} else {
-								getConsoleView().DisplayOptions("battle lost");
+								getConsoleView().displayOptions("battle lost");
 								return false;
 							}
 						}
@@ -226,6 +242,15 @@ public class Controller {
 			}
 		}
 		return false;
+	}
+
+	private void Equip(Artefact artefact) {
+		if (weapon.containsValue(artefact.getName()))
+				hero.equipWeapon((Weapon) artefact);
+		else if (armor.containsValue(artefact.getName()))
+				hero.equipArmor((Armor) artefact);
+		else if (artefact.getName().equalsIgnoreCase("Health Portion"))
+				hero.equipHelm((Helm) artefact);
 	}
 
 	private Villain checkForEnemies(String userInput, int coordsX, int coordsY) {
@@ -302,7 +327,7 @@ public class Controller {
 		return villains;
 	}
 
-	private boolean simulateFight(Villain villain) throws SQLException {
+	private boolean simulateFight(Villain villain) {
 		Random random = new Random();
 		while ((hero.getHitPoints() > 0) && (villain.getHitPoints() > 0)) {
 			int heroAction = random.nextInt(2);
@@ -312,11 +337,17 @@ public class Controller {
 			if ((heroAction == 1) && (villainAction == 1)) {
 				hero.setHitPoints(hero.getHitPoints() - villain.getAttack());
 				villain.setHitPoints(hero.getHitPoints() - hero.getAttack());
-			} else if ((heroAction == 1) && (villainAction == 0)) {
-				damageTaken = Math.max((hero.getAttack() - villain.getDefense()), 0);
+			} else if ((heroAction == 1) || (villainAction == 0)) {
+				if ((hero.getAttack() - villain.getDefense()) > 0)
+					damageTaken = hero.getAttack() - villain.getDefense();
+				else
+					damageTaken = 0;
 				villain.setHitPoints(villain.getHitPoints() - damageTaken);
 			} else if ((heroAction == 0) && (villainAction == 1)) {
-				damageTaken = Math.max((villain.getAttack() - hero.getDefense()), 0);
+				if ((villain.getAttack() - hero.getDefense()) > 0)
+					damageTaken = villain.getAttack() - hero.getDefense();
+				else
+					damageTaken = 0;
 				hero.setHitPoints(villain.getHitPoints() - damageTaken);
 			}
 		}
@@ -351,7 +382,7 @@ public class Controller {
 			hero.setExperience(hero.getExperience() + experience);
 			int playerPosition;
 
-			if (hero.getLevel() >= levelingUpXp) {
+			if (hero.getExperience() >= levelingUpXp) {
 				hero.setLevel(hero.getLevel() + 1);
 				getConsoleView().setMapSize((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
 				playerPosition = getConsoleView().getMapSize() / 2;
@@ -362,17 +393,41 @@ public class Controller {
 		}
 	}
 
-	private Artefact generateArtefact(Characters character) {
+	private Artefact generateArtifact(Characters character) {
 		Random random = new Random();
-		int randomNumber = random.nextInt(6);
+		int points;
+		weapon = new HashMap<>();
+		armor = new HashMap<>();
 
-		if (randomNumber == 1)
-			return new Weapon("Sword", character.getAttack());
-		else if (randomNumber == 2)
-			return new Armor("Leather Armor", character.getDefense() + 5);
-		else if ((randomNumber == 3) || (randomNumber == 4))
-			return new Helm("Health Potion", random.nextInt(14));
-		else
+		armor.put(1, "Leather Armor");
+		armor.put(2, "Shield");
+
+		weapon.put(1, "Sword");
+		weapon.put(2, "Spear");
+
+		if (random.nextInt(8) == 1) {
+			points = random.nextInt((hero.getLevel() * 30) - character.getAttack()) + character.getAttack();
+			return generateWeapon(weapon.get(random.nextInt(3)), points);
+		}
+		else if (random.nextInt(8) == 2) {
+			points = character.getDefense() + 5;
+			return generateArmor(armor.get(random.nextInt(3)), points);
+		} else if ((random.nextInt(8) == 3) || (random.nextInt(8) == 4)) {
+			points = random.nextInt(hero.getLevel() * 10);
+			return generateHelm("Health portion", points);
+		} else
 			return null;
+	}
+
+	private Weapon generateWeapon(String name, int points) {
+		return new Weapon(name, points);
+	}
+
+	private Armor generateArmor(String name, int points) {
+		return new Armor(name, points);
+	}
+
+	private Helm generateHelm(String name, int points) {
+		return new Helm(name, points);
 	}
 }

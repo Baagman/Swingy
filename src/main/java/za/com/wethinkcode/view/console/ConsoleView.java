@@ -19,6 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.validation.constraints.NotNull;
+
+import za.com.wethinkcode.model.artefacts.Artefact;
 import za.com.wethinkcode.model.characters.Hero;
 import za.com.wethinkcode.model.characters.Villain;
 
@@ -49,8 +51,9 @@ public class ConsoleView {
 		System.out.println(" ");
 	}
 
-	public void DisplayOptions(String gameMode) {
+	public void displayOptions(String gameMode) {
 
+		boolean inputField = true;
 		switch (gameMode.toLowerCase()) {
 			case "play":
 				System.out.println("0 - Exit");
@@ -75,13 +78,22 @@ public class ConsoleView {
 				break;
 			case "battle won":
 				System.out.println("You Won The Battle");
+				System.out.println("-----------------------");
+				inputField = false;
 				break;
 			case "battle lost":
 				System.out.println("You Lost...\nGame Over");
+				inputField = false;
 				break;
+			case "artefact dropped":
+				System.out.println("1 - Pick Up");
+				System.out.println("2 - Leave");
 		}
-		System.out.println("-----------------------");
-		System.out.print("Please Input Option: ");
+
+		if (inputField) {
+			System.out.println("-----------------------");
+			System.out.print("Please Input Option: ");
+		}
 	}
 
 	public int  displayHeroStats(ResultSet resultSet) {
@@ -112,7 +124,7 @@ public class ConsoleView {
 		return id;
 	}
 
-	public boolean getVillainsToDisplay(ArrayList<Villain> villains, int x, int y) {
+	private boolean getVillainsToDisplay(ArrayList<Villain> villains, int x, int y) {
 		for (Villain villain : villains) {
 			if (villain.getPosition().getY() == y) {
 				if (villain.getPosition().getX() == x)
@@ -120,5 +132,18 @@ public class ConsoleView {
 			}
 		}
 		return false;
+	}
+
+	public void displayVillainStats(Villain villain) {
+		System.out.println(villain.getName() +" Encountered");
+		System.out.println("Attack: " + villain.getAttack());
+		System.out.println("Defense: " + villain.getDefense());
+		System.out.println("Hit points: " + villain.getHitPoints());
+		System.out.println("-----------------------");
+	}
+
+	public void displayArtefactStats(Villain villain, Artefact artefact) {
+		System.out.println(villain.getName() + " Dropped An Artefact: " + artefact.getName());
+		System.out.println("Points: " + artefact.getPoints());
 	}
 }
