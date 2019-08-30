@@ -40,22 +40,21 @@ public abstract class Hero extends Characters {
 	}
 
 	public void equipWeapon(Weapon weapon) {
-
 		if (weapon != null) {
 			if (this.weapon != null) {
 				this.attack -= this.weapon.getPoints();
-				this.attack = Math.max(getAttack(), 0);
+				this.attack = getAttack() > 0 ? getAttack() : 0;
 			}
 			this.attack += weapon.getPoints();
+			this.weapon = weapon;
 		}
-		this.weapon = weapon;
 	}
 
 	public void equipArmor(Armor armor) {
 		if (armor != null) {
 			if (this.armor != null) {
 				this.defense -= getArmor().getPoints();
-				this.defense = Math.max(getDefense(), 0);
+				this.defense = getDefense() > 0 ? getDefense() : 0;
 			}
 			this.defense += armor.getPoints();
 			this.armor = armor;
@@ -66,7 +65,7 @@ public abstract class Hero extends Characters {
 		if (helm != null) {
 			if (this.helm != null) {
 				this.hitPoints -= getHelm().getPoints();
-				this.hitPoints = Math.max(getHitPoints(), 0);
+				this.hitPoints = getHitPoints() > 0 ? getHitPoints() : 0;
 			}
 			this.hitPoints += helm.getPoints();
 			this.helm = helm;
