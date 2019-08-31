@@ -28,7 +28,6 @@ public abstract class Hero extends Characters {
 	private int			level;
 	private int experience;
 
-	@Setter(AccessLevel.NONE)
 	private Weapon		weapon;
 	private Armor		armor;
 	private Helm		helm;

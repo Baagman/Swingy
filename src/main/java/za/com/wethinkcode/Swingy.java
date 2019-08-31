@@ -17,6 +17,7 @@ import za.com.wethinkcode.contoller.Controller;
 import za.com.wethinkcode.model.util.Database;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 
 public class Swingy {
@@ -25,11 +26,11 @@ public class Swingy {
 		if (((args[0].equalsIgnoreCase("console")) || (args[0].equalsIgnoreCase("gui")))
 				&& (args.length == 1)) {
 			try {
-				Controller controller = new Controller(new Database());
+				Database database = new Database();
+				Controller controller = new Controller(database);
 				controller.PlayerInit(args[0]);
-			} catch (SQLException | ClassNotFoundException | NullPointerException | InvalidHero Exception) {
-				System.out.print("Error: ");
-				System.out.println(Arrays.toString(Exception.getStackTrace()));
+			} catch (SQLException | ClassNotFoundException | InvalidHero exception) {
+				System.out.println(exception.getMessage().toUpperCase());
 			}
 		}
 	}

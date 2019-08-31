@@ -43,11 +43,12 @@ public class Controller {
 	private static boolean quitGame = true;
 	private static boolean consoleViewMode;
 	private ArrayList<Villain> villains;
-	@Setter
-	@Getter
+
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private HashMap<Integer, String> armor;
-	@Setter
-	@Getter
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private HashMap<Integer, String> weapon;
 
 	public Controller(Database database) {
@@ -143,6 +144,8 @@ public class Controller {
 	private Hero createHero(ResultSet resultSet) throws SQLException {
 		String heroClass;
 		Hero hero = null;
+		ResultSet artefacts;
+
 		if ((resultSet != null) && (resultSet.next())) {
 			heroClass = resultSet.getString("heroClass");
 			if (heroClass.equalsIgnoreCase("Warrior")) {
@@ -169,15 +172,19 @@ public class Controller {
 			}
 
 			if (hero != null) {
-				if ((resultSet.getString("helm") != null) &&
-					(!resultSet.getString("helm").isEmpty()))
-					hero.equipHelm(generateHelm(resultSet.getString("helm"), 0));
-				if ((resultSet.getString("armor") != null) &&
-						(!resultSet.getString("armor").isEmpty()))
-					hero.equipArmor(generateArmor(resultSet.getString("armor"), 0));
-				if ((resultSet.getString("weapon") != null) &&
-						(!resultSet.getString("weapon").isEmpty()))
-						hero.equipWeapon(generateWeapon(resultSet.getString("weapon"), 0));
+				artefacts = database.selectArtefacts(resultSet.getInt("id"));
+				int points;
+				String name;
+				while (artefacts.next()) {
+					points = artefacts.getInt("points");
+					name = artefacts.getString("name");
+					if (artefacts.getString("type").equalsIgnoreCase("helm"))
+						hero.setHelm(generateHelm(name, points));
+					else if (artefacts.getString("type").equalsIgnoreCase("armor"))
+						hero.setArmor(generateArmor(name, points));
+					else if (artefacts.getString("type").equalsIgnoreCase("weapon"))
+						hero.setWeapon(generateWeapon(name, points));
+				}
 			}
 		}
 		return hero;
@@ -217,13 +224,15 @@ public class Controller {
 						} else if (userInput.equals("2")) {
 							if (simulateFight(villain)) {
 								getConsoleView().displayOptions("battle won");
-								Artefact artefact = generateArtifact(villain);
+								Artefact artefact = generateRandomArtifact(villain);
 								if (artefact != null) {
 									getConsoleView().displayArtefactStats(villain, artefact);
 									getConsoleView().displayOptions("artefact dropped");
 									userInput = getScanner().nextLine();
-									if (userInput.equals("1"))
+									if (userInput.equals("1")) {
 										Equip(artefact);
+										database.addArtefactToTable(artefact, hero.getName());
+									}
 								}
 								villains.remove(villain);
 								database.updateHero(hero);
@@ -393,25 +402,25 @@ public class Controller {
 		}
 	}
 
-	private Artefact generateArtifact(Characters character) {
+	private Artefact generateRandomArtifact(Characters character) {
 		Random random = new Random();
 		int points;
 		weapon = new HashMap<>();
 		armor = new HashMap<>();
 
-		armor.put(1, "Leather Armor");
-		armor.put(2, "Shield");
+		armor.put(0, "Leather Armor");
+		armor.put(1, "Shield");
 
-		weapon.put(1, "Sword");
-		weapon.put(2, "Spear");
+		weapon.put(0, "Sword");
+		weapon.put(1, "Spear");
 
 		if (random.nextInt(8) == 1) {
 			points = random.nextInt((hero.getLevel() * 30) - character.getAttack()) + character.getAttack();
-			return generateWeapon(weapon.get(random.nextInt(3)), points);
+			return generateWeapon(weapon.get(random.nextInt(1)), points);
 		}
 		else if (random.nextInt(8) == 2) {
 			points = character.getDefense() + 5;
-			return generateArmor(armor.get(random.nextInt(3)), points);
+			return generateArmor(armor.get(random.nextInt(1)), points);
 		} else if ((random.nextInt(8) == 3) || (random.nextInt(8) == 4)) {
 			points = random.nextInt(hero.getLevel() * 10);
 			return generateHelm("Health portion", points);

@@ -20,9 +20,11 @@ import lombok.Setter;
 abstract public class Artefact {
     protected String name;
     protected int points;
+    private String type;
 
-    protected Artefact(String name, int points) {
+    Artefact(String name, int points, String type) {
         this.name = name;
         this.points = points;
+        this.type = type;
     }
 }
