@@ -22,6 +22,7 @@ import java.sql.Statement;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import za.com.wethinkcode.model.artefacts.Artefact;
 import za.com.wethinkcode.model.characters.Hero;
 
 @Getter
@@ -39,6 +40,7 @@ public class Database {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:Swingy.db");
 			createHeroTable();
+			createArtefactsTable();
 		} catch (SQLException sqlException) {
 			throw new SQLException("Unable to connect to the database: " + sqlException.getMessage());
 		} catch (ClassNotFoundException classNotFoundException) {
@@ -46,28 +48,30 @@ public class Database {
 		}
 	}
 
-	private void createHeroTable() throws SQLException, NullPointerException {
+	private void createHeroTable() throws SQLException {
 
-		StringBuilder sqlCreateTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS HEROES (\n");
-		sqlCreateTable.append(" name TEXT NOT NULL, \n");
-		sqlCreateTable.append(" heroclass TEXT NOT NULL, \n");
-		sqlCreateTable.append(" armor TEXT, \n");
-		sqlCreateTable.append(" weapon TEXT, \n");
-		sqlCreateTable.append(" helm TEXT, \n");
-		sqlCreateTable.append(" attack INTEGER, \n");
-		sqlCreateTable.append(" defense INTEGER, \n");
-		sqlCreateTable.append(" hitpoints INTEGER, \n");
-		sqlCreateTable.append(" level INTEGER, \n");
-		sqlCreateTable.append(" experience INTEGER\n");
-		sqlCreateTable.append(");");
+		StringBuilder sqlCreateHeroTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS HEROES (\n");
+		sqlCreateHeroTable.append(" id INTEGER PRIMARY KEY AUTOINCREMENT, \n");
+		sqlCreateHeroTable.append(" name TEXT NOT NULL, \n");
+		sqlCreateHeroTable.append(" heroclass TEXT NOT NULL, \n");
+		sqlCreateHeroTable.append(" armor TEXT, \n");
+		sqlCreateHeroTable.append(" weapon TEXT, \n");
+		sqlCreateHeroTable.append(" helm TEXT, \n");
+		sqlCreateHeroTable.append(" attack INTEGER, \n");
+		sqlCreateHeroTable.append(" defense INTEGER, \n");
+		sqlCreateHeroTable.append(" hitpoints INTEGER, \n");
+		sqlCreateHeroTable.append(" level INTEGER, \n");
+		sqlCreateHeroTable.append(" experience INTEGER\n");
+		sqlCreateHeroTable.append(");");
 		setStatement(getConnection().createStatement());
-		getStatement().execute(sqlCreateTable.toString());
+		getStatement().execute(sqlCreateHeroTable.toString());
 		getStatement().close();
 	}
 
 	public void addNewHeroToTable(String heroName) throws SQLException {
 
-		String sqlInsertHero = "INSERT INTO HEROES VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		StringBuilder sqlInsertHero = new StringBuilder().append("INSERT INTO HEROES (name, heroclass, armor, weapon, helm, \n");
+		sqlInsertHero.append("attack, defense, hitpoints, level, experience) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 		int attack = 0;
 		int defense = 0;
 		int hitpoints = 12;
@@ -88,7 +92,7 @@ public class Database {
 		}
 
 		try {
-			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero);
+			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero.toString());
 			preparedStatement.setString(1, heroName);
 			preparedStatement.setString(2, this.heroClass);
 			preparedStatement.setString(3, null);
@@ -107,13 +111,13 @@ public class Database {
 	}
 
 	public ResultSet AvailableHeroes() throws SQLException {
-		String selectHeros = "SELECT * FROM HEROES;";
+		String selectHeroes = "SELECT * FROM HEROES;";
 		ResultSet resultSet;
 		try {
 			setStatement(getConnection().createStatement());
-			resultSet = getStatement().executeQuery(selectHeros);
+			resultSet = getStatement().executeQuery(selectHeroes);
 		} catch (SQLException sqlException) {
-			throw new SQLException("Unable to connect to database: " + sqlException.getMessage());
+			throw new SQLException("Unable to connect to database " + sqlException.getMessage());
 		}
 		return resultSet;
 	}
@@ -126,7 +130,7 @@ public class Database {
 			preparedStatement.setString(1, name);
 			resultSet = preparedStatement.executeQuery();
 		} catch (SQLException sqlException) {
-			throw new SQLException("Unable to connect to database: " + sqlException.getMessage());
+			throw new SQLException("Unable to connect to database " + sqlException.getMessage());
 		}
 		return resultSet;
 	}
@@ -161,5 +165,61 @@ public class Database {
 				throw new SQLException("Unable to Update hero stats in the database: " + sqlException.getMessage());
 			}
 		}
+	}
+
+	private void createArtefactsTable() throws SQLException {
+		StringBuilder sqlCreateArtefactTable = new StringBuilder().append("CREATE TABLE IF NOT EXISTS ARTEFACTS (\n");
+		sqlCreateArtefactTable.append(" ID INTEGER NOT NULL, \n");
+		sqlCreateArtefactTable.append(" name TEXT NOT NULL, \n");
+		sqlCreateArtefactTable.append(" type TEXT NOT NULL, \n");
+		sqlCreateArtefactTable.append(" points INTEGER NOT NULL \n");
+		sqlCreateArtefactTable.append(");");
+		setStatement(getConnection().createStatement());
+		getStatement().execute(sqlCreateArtefactTable.toString());
+		getStatement().close();
+	}
+
+	public void addArtefactToTable(Artefact artefact, String heroName) throws SQLException {
+		try	{
+			deleteArtefactFromDB(heroName, artefact.getType());
+			String addArtefact = "INSERT INTO ARTEFACTS VALUES ((SELECT _ROWID_ FROM HEROES WHERE HEROES.name = ?), ?, ?, ?);";
+			PreparedStatement preparedStatement = getConnection().prepareStatement(addArtefact);
+			preparedStatement.setString(1, heroName);
+			preparedStatement.setString(2, artefact.getName());
+			preparedStatement.setString(3, artefact.getType());
+			preparedStatement.setInt(4, artefact.getPoints());
+			preparedStatement.execute();
+			preparedStatement.close();
+		} catch (SQLException sqlException) {
+			throw new SQLException(sqlException.getMessage());
+		}
+	}
+
+	private void deleteArtefactFromDB(String heroName, String artefactType) throws SQLException {
+		try {
+			StringBuilder deleteArtefact = new StringBuilder().append("DELETE FROM ARTEFACTS WHERE ");
+			deleteArtefact.append("( ID = (SELECT id FROM HEROES WHERE HEROES.name = ? )");
+			deleteArtefact.append( " AND type = ?);");
+			PreparedStatement preparedStatement = getConnection().prepareStatement(deleteArtefact.toString());
+			preparedStatement.setString(1, heroName);
+			preparedStatement.setString(2, artefactType);
+			preparedStatement.execute();
+			preparedStatement.close();
+		} catch (SQLException sqlException) {
+			throw new SQLException(sqlException);
+		}
+	}
+
+	public ResultSet selectArtefacts(int id) throws SQLException {
+		String sqlGetArtefacts = "SELECT * FROM ARTEFACTS WHERE id = ?;";
+		ResultSet resultSet;
+		try {
+			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlGetArtefacts);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+		} catch (SQLException sqlException) {
+			throw new SQLException("Unable to connect to database: " + sqlException.getMessage());
+		}
+		return resultSet;
 	}
 }

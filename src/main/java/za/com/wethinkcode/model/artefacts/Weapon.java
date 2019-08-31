@@ -15,6 +15,6 @@ package za.com.wethinkcode.model.artefacts;
 public class Weapon extends Artefact {
 
 	public Weapon(String name, int points) {
-		super(name, points);
+		super(name, points, "Weapon");
 	}
 }
