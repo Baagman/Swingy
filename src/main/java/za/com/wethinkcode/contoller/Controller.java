@@ -29,6 +29,7 @@ import za.com.wethinkcode.model.characters.*;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
+import za.com.wethinkcode.view.gui.Gui;
 
 @Getter
 @Setter
@@ -40,9 +41,10 @@ public class Controller {
 	private Database database;
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
-	private static boolean quitGame = true;
+	private static boolean quitGame;
 	private static boolean consoleViewMode;
 	private ArrayList<Villain> villains;
+	private Gui gui;
 
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
@@ -58,64 +60,70 @@ public class Controller {
 	public void PlayerInit(String mode) throws SQLException, InvalidHero {
 
 		this.scanner = new Scanner(System.in);
-		consoleView = new ConsoleView();
+		quitGame = true;
 
-		while (quitGame) {
-			if (mode.equalsIgnoreCase("console")) {
-				consoleViewMode = true;
-				ConsoleMode();
-			}
+		if (mode.equalsIgnoreCase("console")) {
+			consoleViewMode = true;
+			consoleView = new ConsoleView();
+			ConsoleMode();
+		} else if (mode.equalsIgnoreCase("gui")) {
+			gui = new Gui();
+			GuiMode();
 		}
 		scanner.close();
 	}
 
 	private void ConsoleMode() throws SQLException, InvalidHero {
+		while (quitGame) {
+			consoleView.displayOptions("Player Selection");
+			String userInput = scanner.nextLine();
 
-		consoleView.displayOptions("Player Selection");
-		String userInput = scanner.nextLine();
-
-		switch (userInput) {
-			case "0":
-				quitGame = false;
-				break;
-			case "1":
-				if (consoleView.displayHeroStats(database.AvailableHeroes()) > 0) {
-					System.out.print("Please Select A Hero By Entering Their Name: ");
+			switch (userInput) {
+				case "0":
+					quitGame = false;
+					break;
+				case "1":
+					if (consoleView.displayHeroStats(database.AvailableHeroes()) > 0) {
+						System.out.print("Please Select A Hero By Entering Their Name: ");
+						userInput = scanner.nextLine();
+						setHero(createHero(database.selectHero(userInput)));
+						if (hero != null)
+							quitGame = GameInit();
+						else {
+							throw new InvalidHero("No Such Hero");
+						}
+					} else {
+						System.out.println("No Heroes available...Please Create A New Hero..");
+						System.out.println("-----------------------");
+					}
+					break;
+				case "2":
+					String heroclass;
+					consoleView.displayOptions("selecting hero class");
 					userInput = scanner.nextLine();
-					setHero(createHero(database.selectHero(userInput)));
-					if (hero != null)
-						quitGame = GameInit();
-				} else {
-					System.out.println("No Heroes available...Please Create A New Hero..");
-					System.out.println("-----------------------");
-				}
-				break;
-			case "2":
-				String heroclass;
-				consoleView.displayOptions("selecting hero class");
-				userInput = scanner.nextLine();
-				heroclass = getClassHeroType(userInput);
-				if (heroclass != null) {
-					database.setHeroClass(heroclass);
-				} else
-					throw new InvalidHero("Unknown Hero Class");
-				System.out.print("To Create A New Hero Enter the Hero's name: ");
-				userInput = scanner.nextLine();
-				if (checkIfHeroNameExist(userInput)) {
-					setHero(createHero(database.selectHero(userInput)));
-					if (this.hero != null) {
-						hero.setHeroClass(heroclass);
-						quitGame = GameInit();
+					heroclass = getClassHeroType(userInput);
+					if (heroclass != null) {
+						database.setHeroClass(heroclass);
 					} else
-						throw new InvalidHero("Cannot Create New Hero");
-				} else {
-					System.out.println("Hero Name Already Exists...Please Try Other Options");
+						throw new InvalidHero("Unknown Hero Class");
+					System.out.print("To Create A New Hero Enter the Hero's name: ");
+					userInput = scanner.nextLine();
+					if (checkIfHeroNameExist(userInput)) {
+						setHero(createHero(database.selectHero(userInput)));
+						if (this.hero != null) {
+							hero.setHeroClass(heroclass);
+							quitGame = GameInit();
+						} else
+							throw new InvalidHero("Cannot Create New Hero");
+					} else {
+						System.out.println("Hero Name Already Exists...Please Try Other Options");
+						System.out.println("-----------------------");
+					}
+					break;
+				default:
+					System.out.println("Invalid Input Please Try Again");
 					System.out.println("-----------------------");
-				}
-				break;
-			default:
-				System.out.println("Invalid Input Please Try Again");
-				System.out.println("-----------------------");
+			}
 		}
 	}
 
@@ -202,7 +210,7 @@ public class Controller {
 			getConsoleView().setHero(hero);
 		}
 		villains = generateVillains((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
-		while (true) {
+		while (quitGame) {
 			if (consoleViewMode) {
 				String userInput;
 				getConsoleView().printAndUpdateMap(villains);
@@ -438,5 +446,9 @@ public class Controller {
 
 	private Helm generateHelm(String name, int points) {
 		return new Helm(name, points);
+	}
+
+	private void GuiMode() {
+		gui.prepareGui();
 	}
 }
