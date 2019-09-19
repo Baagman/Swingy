@@ -40,7 +40,6 @@ public class Gui {
 		mainPanel.add(selectHeroButton);
 		mainPanel.add(exitButton);
 		mainFrame.setContentPane(mainPanel);
-		mainFrame.setLocationByPlatform(true);
 		mainFrame.setVisible(true);
 	}
 
@@ -48,7 +47,8 @@ public class Gui {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			String command = actionEvent.getActionCommand();
-
+			JPanel heroPanel = new JPanel(new GridLayout(1, 1));
+			JTextField heroName = new JTextField();
 			switch (command) {
 				case "Exit":
 					System.exit(0);
@@ -56,6 +56,9 @@ public class Gui {
 				case "Select Existing Hero":
 					break;
 				case "Create New Hero":
+					selectHeroButton.setVisible(false);
+					heroPanel.add(heroName);
+					mainFrame.add(heroPanel);
 					break;
 			}
 			mainPanel.updateUI();

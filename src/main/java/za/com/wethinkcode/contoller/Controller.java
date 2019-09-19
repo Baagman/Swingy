@@ -57,77 +57,8 @@ public class Controller {
 		this.database = database;
 	}
 
-	public void PlayerInit(String mode) throws SQLException, InvalidHero {
-
-		this.scanner = new Scanner(System.in);
-		quitGame = true;
-
-		if (mode.equalsIgnoreCase("console")) {
-			consoleViewMode = true;
-			consoleView = new ConsoleView();
-			ConsoleMode();
-		} else if (mode.equalsIgnoreCase("gui")) {
-			gui = new Gui();
-			GuiMode();
-		}
-		scanner.close();
-	}
-
-	private void ConsoleMode() throws SQLException, InvalidHero {
-		while (quitGame) {
-			consoleView.displayOptions("Player Selection");
-			String userInput = scanner.nextLine();
-
-			switch (userInput) {
-				case "0":
-					quitGame = false;
-					break;
-				case "1":
-					if (consoleView.displayHeroStats(database.AvailableHeroes()) > 0) {
-						System.out.print("Please Select A Hero By Entering Their Name: ");
-						userInput = scanner.nextLine();
-						setHero(createHero(database.selectHero(userInput)));
-						if (hero != null)
-							quitGame = GameInit();
-						else {
-							throw new InvalidHero("No Such Hero");
-						}
-					} else {
-						System.out.println("No Heroes available...Please Create A New Hero..");
-						System.out.println("-----------------------");
-					}
-					break;
-				case "2":
-					String heroclass;
-					consoleView.displayOptions("selecting hero class");
-					userInput = scanner.nextLine();
-					heroclass = getClassHeroType(userInput);
-					if (heroclass != null) {
-						database.setHeroClass(heroclass);
-					} else
-						throw new InvalidHero("Unknown Hero Class");
-					System.out.print("To Create A New Hero Enter the Hero's name: ");
-					userInput = scanner.nextLine();
-					if (checkIfHeroNameExist(userInput)) {
-						setHero(createHero(database.selectHero(userInput)));
-						if (this.hero != null) {
-							hero.setHeroClass(heroclass);
-							quitGame = GameInit();
-						} else
-							throw new InvalidHero("Cannot Create New Hero");
-					} else {
-						System.out.println("Hero Name Already Exists...Please Try Other Options");
-						System.out.println("-----------------------");
-					}
-					break;
-				default:
-					System.out.println("Invalid Input Please Try Again");
-					System.out.println("-----------------------");
-			}
-		}
-	}
-
-	private void Move(String direction, int sizeOfMap) {
+	public void Move(String direction) {
+		int sizeOfMap = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2)));
 
 		switch (direction) {
 			case "1":
@@ -149,10 +80,11 @@ public class Controller {
 		}
 	}
 
-	private Hero createHero(ResultSet resultSet) throws SQLException {
+	public Hero createHero(String heroName) throws SQLException {
 		String heroClass;
 		Hero hero = null;
 		ResultSet artefacts;
+		ResultSet resultSet = database.selectHero(heroName);
 
 		if ((resultSet != null) && (resultSet.next())) {
 			heroClass = resultSet.getString("heroClass");
@@ -182,95 +114,38 @@ public class Controller {
 			if (hero != null) {
 				artefacts = database.selectArtefacts(resultSet.getInt("id"));
 				int points;
-				String name;
+				String artefactName;
 				while (artefacts.next()) {
 					points = artefacts.getInt("points");
-					name = artefacts.getString("name");
+					artefactName = artefacts.getString("name");
 					if (artefacts.getString("type").equalsIgnoreCase("helm"))
-						hero.setHelm(generateHelm(name, points));
+						hero.setHelm(generateHelm(artefactName, points));
 					else if (artefacts.getString("type").equalsIgnoreCase("armor"))
-						hero.setArmor(generateArmor(name, points));
+						hero.setArmor(generateArmor(artefactName, points));
 					else if (artefacts.getString("type").equalsIgnoreCase("weapon"))
-						hero.setWeapon(generateWeapon(name, points));
+						hero.setWeapon(generateWeapon(artefactName, points));
 				}
+				setHero(hero);
+				getHero().setHeroClass(heroClass);
 			}
 		}
 		return hero;
 	}
 
-	private boolean GameInit() throws SQLException {
-
-		int playerPosition;
-		String[] movements = {"1", "2", "3", "4"};
-
-		if (consoleViewMode) {
-			getConsoleView().setMapSize((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
-			playerPosition = getConsoleView().getMapSize() / 2;
-			hero.setPosition(new Coordinates(playerPosition, playerPosition));
-			getConsoleView().setHero(hero);
-		}
-		villains = generateVillains((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
-		while (quitGame) {
-			if (consoleViewMode) {
-				String userInput;
-				getConsoleView().printAndUpdateMap(villains);
-				getConsoleView().displayOptions("Play");
-				userInput = getScanner().nextLine();
-				if (userInput.equals("0"))
-					break;
-				else if (Arrays.asList(movements).contains(userInput)) {
-					Villain villain = checkForEnemies(userInput, hero.getPosition().getX(), hero.getPosition().getY());
-					if (villain != null) {
-						Coordinates previousPosition = new Coordinates(hero.getPosition().getX(), hero.getPosition().getY());
-						Move(userInput, getConsoleView().getMapSize());
-						getConsoleView().printAndUpdateMap(villains);
-						getConsoleView().displayVillainStats(villain);
-						getConsoleView().displayOptions("enemy ahead");
-						userInput = getScanner().nextLine();
-						if (userInput.equals("1")) {
-							hero.Run(previousPosition);
-						} else if (userInput.equals("2")) {
-							if (simulateFight(villain)) {
-								getConsoleView().displayOptions("battle won");
-								Artefact artefact = generateRandomArtifact(villain);
-								if (artefact != null) {
-									getConsoleView().displayArtefactStats(villain, artefact);
-									getConsoleView().displayOptions("artefact dropped");
-									userInput = getScanner().nextLine();
-									if (userInput.equals("1")) {
-										Equip(artefact);
-										database.addArtefactToTable(artefact, hero.getName());
-									}
-								}
-								villains.remove(villain);
-								database.updateHero(hero);
-							} else {
-								getConsoleView().displayOptions("battle lost");
-								return false;
-							}
-						}
-					}
-					else
-						Move(userInput, getConsoleView().getMapSize());
-				} else {
-					System.out.println("Invalid Input Please Try Again");
-					System.out.println("-----------------------");
-				}
-			}
-		}
-		return false;
-	}
-
-	private void Equip(Artefact artefact) {
+	public void Equip(Artefact artefact) throws SQLException {
 		if (weapon.containsValue(artefact.getName()))
 				hero.equipWeapon((Weapon) artefact);
 		else if (armor.containsValue(artefact.getName()))
 				hero.equipArmor((Armor) artefact);
 		else if (artefact.getName().equalsIgnoreCase("Health Portion"))
 				hero.equipHelm((Helm) artefact);
+		database.addArtefactToTable(artefact, hero.getName());
 	}
 
-	private Villain checkForEnemies(String userInput, int coordsX, int coordsY) {
+	public Villain checkForEnemies(String userInput, Coordinates coordinates) {
+
+		int coordsY = coordinates.getY();
+		int coordsX = coordinates.getX();
 
 		switch (userInput) {
 			case "1":
@@ -295,7 +170,7 @@ public class Controller {
 		return null;
 	}
 
-	private String getClassHeroType(String index) {
+	public String getClassHeroType(String index) {
 		HashMap<String, String> heroClass = new HashMap<>();
 		heroClass.put("1", "Warrior");
 		heroClass.put("2", "Hunter");
@@ -303,7 +178,7 @@ public class Controller {
 		return heroClass.get(index);
 	}
 
-	private boolean checkIfHeroNameExist(String heroName) throws SQLException {
+	public boolean checkIfHeroNameExist(String heroName, String heroClass) throws SQLException {
 
 		boolean isExist = true;
 		if ((heroName != null) && (!heroName.isEmpty())) {
@@ -311,14 +186,15 @@ public class Controller {
 			if ((resultSet != null) && (resultSet.next()))
 				isExist = false;
 			else
-				database.addNewHeroToTable(heroName);
+				database.addNewHeroToTable(heroName, heroClass);
 		} else
 			isExist = false;
 		return isExist;
 	}
 
-	private ArrayList<Villain> generateVillains(int mapSize) {
+	public ArrayList<Villain> generateVillains() {
 
+		int mapSize = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2)));
 		ArrayList<Villain> villains = new ArrayList<>();
 		int position;
 		int x = 0;
@@ -344,7 +220,7 @@ public class Controller {
 		return villains;
 	}
 
-	private boolean simulateFight(Villain villain) {
+	public boolean simulateFight(Villain villain) {
 		Random random = new Random();
 		while ((hero.getHitPoints() > 0) && (villain.getHitPoints() > 0)) {
 			int heroAction = random.nextInt(2);
@@ -393,24 +269,20 @@ public class Controller {
 	}
 
 	private void addExperience(int experience) {
-		if (consoleViewMode) {
-			int tempLevel = hero.getLevel() + 1;
-			int levelingUpXp = (tempLevel * 1000) + ((int)Math.pow((tempLevel - 1), 2) * 450);
-			hero.setExperience(hero.getExperience() + experience);
-			int playerPosition;
+		int tempLevel = hero.getLevel() + 1;
+		int levelingUpXp = (tempLevel * 1000) + ((int)Math.pow((tempLevel - 1), 2) * 450);
+		hero.setExperience(hero.getExperience() + experience);
+		int playerPosition;
 
-			if (hero.getExperience() >= levelingUpXp) {
-				hero.setLevel(hero.getLevel() + 1);
-				getConsoleView().setMapSize((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
-				playerPosition = getConsoleView().getMapSize() / 2;
-				hero.setPosition(new Coordinates(playerPosition, playerPosition));
-				villains = null;
-				villains = generateVillains((hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2));
-			}
+		if (hero.getExperience() >= levelingUpXp) {
+			hero.setLevel(hero.getLevel() + 1);
+			playerPosition = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2))) / 2;
+			hero.setPosition(new Coordinates(playerPosition, playerPosition));
+			villains = null;
 		}
 	}
 
-	private Artefact generateRandomArtifact(Characters character) {
+	public Artefact generateRandomArtifact(Characters character) {
 		Random random = new Random();
 		int points;
 		weapon = new HashMap<>();
@@ -448,7 +320,17 @@ public class Controller {
 		return new Helm(name, points);
 	}
 
-	private void GuiMode() {
-		gui.prepareGui();
+	public void updateHero() throws SQLException {
+		database.updateHero(hero);
+	}
+
+	public boolean GameWon() {
+		int mapSize = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2)));
+		if ((hero.getPosition().getX() == 0) || (hero.getPosition().getY() == 0))
+			return true;
+		else if ((mapSize == hero.getPosition().getX() + 1) || (mapSize == hero.getPosition().getY() + 1))
+			return true;
+		else
+			return false;
 	}
 }

@@ -31,8 +31,6 @@ public class Database {
 
 	private Connection connection;
 	private Statement statement;
-	@Getter(AccessLevel.NONE)
-	private String heroClass;
 
 	public Database() throws SQLException, ClassNotFoundException {
 
@@ -68,7 +66,7 @@ public class Database {
 		getStatement().close();
 	}
 
-	public void addNewHeroToTable(String heroName) throws SQLException {
+	public void addNewHeroToTable(String heroName, String heroClass) throws SQLException {
 
 		StringBuilder sqlInsertHero = new StringBuilder().append("INSERT INTO HEROES (name, heroclass, armor, weapon, helm, \n");
 		sqlInsertHero.append("attack, defense, hitpoints, level, experience) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
@@ -76,7 +74,7 @@ public class Database {
 		int defense = 0;
 		int hitpoints = 12;
 
-		switch (this.heroClass) {
+		switch (heroClass) {
 			case "Warrior":
 				attack = 10;
 				defense = 15;
@@ -94,7 +92,7 @@ public class Database {
 		try {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero.toString());
 			preparedStatement.setString(1, heroName);
-			preparedStatement.setString(2, this.heroClass);
+			preparedStatement.setString(2, heroClass);
 			preparedStatement.setString(3, null);
 			preparedStatement.setString(4, null);
 			preparedStatement.setString(5, null);
