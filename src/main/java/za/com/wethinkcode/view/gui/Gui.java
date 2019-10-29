@@ -1,17 +1,29 @@
 package za.com.wethinkcode.view.gui;
 
+import lombok.Getter;
+import lombok.Setter;
+import za.com.wethinkcode.model.util.Database;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+@Getter
+@Setter
 public class Gui {
 	private JPanel mainPanel;
 	private JFrame mainFrame;
 	private JButton selectHeroButton;
 	private JButton createNewHeroButton;
 	private JButton exitButton;
+	private Database database;
 
+	public Gui(Database database) {
+		if (database != null) {
+			this.database = database;
+		}
+	}
 	public void prepareGui() {
 		createUIComponents();
 	}
@@ -32,9 +44,9 @@ public class Gui {
 		createNewHeroButton.setActionCommand("Create New Hero");
 		exitButton.setActionCommand("Exit");
 
-		selectHeroButton.addActionListener(new ButtonClickListener());
-		exitButton.addActionListener(new ButtonClickListener());
-		createNewHeroButton.addActionListener(new ButtonClickListener());
+		selectHeroButton.addActionListener(new MainButtonClickListener());
+		exitButton.addActionListener(new MainButtonClickListener());
+		createNewHeroButton.addActionListener(new MainButtonClickListener());
 
 		mainPanel.add(createNewHeroButton);
 		mainPanel.add(selectHeroButton);
@@ -43,12 +55,13 @@ public class Gui {
 		mainFrame.setVisible(true);
 	}
 
-	class ButtonClickListener implements ActionListener {
+	class MainButtonClickListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			String command = actionEvent.getActionCommand();
 			JPanel heroPanel = new JPanel(new GridLayout(1, 1));
 			JTextField heroName = new JTextField();
+			JCheckBox box = new JCheckBox("Warrior");
 			switch (command) {
 				case "Exit":
 					System.exit(0);
@@ -57,7 +70,9 @@ public class Gui {
 					break;
 				case "Create New Hero":
 					selectHeroButton.setVisible(false);
+					createNewHeroButton.setVisible(false);
 					heroPanel.add(heroName);
+					heroPanel.add(box);
 					mainFrame.add(heroPanel);
 					break;
 			}

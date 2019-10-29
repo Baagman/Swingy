@@ -15,17 +15,22 @@ package za.com.wethinkcode;
 import za.com.wethinkcode.Exceptions.InvalidHero;
 import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
+import za.com.wethinkcode.view.gui.Gui;
 
 import java.sql.SQLException;
 
 public class Swingy {
 	public static void main(String[] args ) {
-
-		if ((args[0].equalsIgnoreCase("console")) && (args.length == 1)) {
+		if (args.length == 1) {
 			try {
 				Database database = new Database();
-				ConsoleView consoleView = new ConsoleView(database);
-				consoleView.playerInit();
+				if (args[0].equalsIgnoreCase("console")) {
+					ConsoleView consoleView = new ConsoleView(database);
+					consoleView.playerInit();
+				} else if (args[0].equalsIgnoreCase("gui")) {
+					Gui gui = new Gui(database);
+					gui.prepareGui();
+				}
 			} catch (SQLException | ClassNotFoundException | InvalidHero exception) {
 				System.out.println(exception.getMessage());
 			}
