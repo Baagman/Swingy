@@ -16,6 +16,7 @@ import za.com.wethinkcode.Exceptions.InvalidHero;
 import za.com.wethinkcode.model.util.Database;
 import za.com.wethinkcode.view.console.ConsoleView;
 import za.com.wethinkcode.view.gui.Gui;
+import za.com.wethinkcode.view.gui.newGui;
 
 import java.sql.SQLException;
 
@@ -28,8 +29,8 @@ public class Swingy {
 					ConsoleView consoleView = new ConsoleView(database);
 					consoleView.playerInit();
 				} else if (args[0].equalsIgnoreCase("gui")) {
-					Gui gui = new Gui(database);
-					gui.prepareGui();
+					//Gui gui = new Gui(database);
+					new newGui(database).setVisible(true);
 				}
 			} catch (SQLException | ClassNotFoundException | InvalidHero exception) {
 				System.out.println(exception.getMessage());
