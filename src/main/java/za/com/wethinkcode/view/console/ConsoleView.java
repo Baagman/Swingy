@@ -324,7 +324,7 @@ public class ConsoleView {
 		int numberOfTries = 3;
 
 		while (true) {
-			if (displayHeroStats(database.AvailableHeroes()) > 0) {
+			if (displayHeroStats(controller.getAvailableHeroes()) > 0) {
 				System.out.print("Please  Select A Hero By Entering Their Hero Name: ");
 				userInput = scanner.nextLine();
 				setHero(controller.createHero(userInput));

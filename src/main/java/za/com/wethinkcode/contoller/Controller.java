@@ -333,4 +333,8 @@ public class Controller {
 		else
 			return false;
 	}
+
+	public ResultSet getAvailableHeroes() throws SQLException {
+		return database.AvailableHeroes();
+	}
 }
