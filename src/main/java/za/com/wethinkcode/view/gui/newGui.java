@@ -3,29 +3,36 @@ package za.com.wethinkcode.view.gui;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.contoller.Controller;
+import za.com.wethinkcode.model.characters.Hero;
 import za.com.wethinkcode.model.util.Database;
 
 /**
  *
  * @author tbaagman
  */
-
 @Getter
 @Setter
 public class newGui extends javax.swing.JFrame {
-    
+
     private Controller controller;
+    private Hero hero;
+
     /**
      * Creates new form newGui
+     *
      * @param database
      */
     public newGui(Database database) {
         initComponents();
         this.controller = new Controller(database);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -41,8 +48,18 @@ public class newGui extends javax.swing.JFrame {
         createNewHeroBtn = new javax.swing.JButton();
         exitGame = new javax.swing.JButton();
         availableHeroPanel = new javax.swing.JPanel();
-        heroNames = new javax.swing.JComboBox<String>();
+        availableHeroes = new javax.swing.JComboBox<String>();
         statsPanel = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        createNewHeroPanel = new javax.swing.JPanel();
+        javax.swing.JLabel heroNameLabel = new javax.swing.JLabel();
+        heroName = new javax.swing.JTextField();
+        warriorCheckBox = new javax.swing.JCheckBox();
+        hunterCheckBox = new javax.swing.JCheckBox();
+        priestCheckBox = new javax.swing.JCheckBox();
+        startGameBtn = new javax.swing.JButton();
+        final javax.swing.JLabel heroClassLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -73,21 +90,28 @@ public class newGui extends javax.swing.JFrame {
             }
         });
 
-        heroNames.addItemListener(new java.awt.event.ItemListener() {
+        availableHeroes.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                heroNamesItemStateChanged(evt);
+                availableHeroesItemStateChanged(evt);
             }
         });
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
+        jTextArea1.setEditable(false);
 
         javax.swing.GroupLayout statsPanelLayout = new javax.swing.GroupLayout(statsPanel);
         statsPanel.setLayout(statsPanelLayout);
         statsPanelLayout.setHorizontalGroup(
             statsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(statsPanelLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         statsPanelLayout.setVerticalGroup(
             statsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 334, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout availableHeroPanelLayout = new javax.swing.GroupLayout(availableHeroPanel);
@@ -95,19 +119,96 @@ public class newGui extends javax.swing.JFrame {
         availableHeroPanelLayout.setHorizontalGroup(
             availableHeroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(availableHeroPanelLayout.createSequentialGroup()
-                .addGap(87, 87, 87)
-                .addComponent(heroNames, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(96, Short.MAX_VALUE))
-            .addComponent(statsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(statsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, availableHeroPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(availableHeroes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(107, 107, 107))
         );
         availableHeroPanelLayout.setVerticalGroup(
             availableHeroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(availableHeroPanelLayout.createSequentialGroup()
-                .addGap(55, 55, 55)
-                .addComponent(heroNames, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(68, Short.MAX_VALUE)
+                .addComponent(availableHeroes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(statsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(statsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        heroNameLabel.setText("Hero Name :");
+
+        warriorCheckBox.setText("Warrior");
+        warriorCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                heroClassCheckBoxItemStateChanged(evt);
+            }
+        });
+
+        hunterCheckBox.setText("Hunter");
+        hunterCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                heroClassCheckBoxItemStateChanged(evt);
+            }
+        });
+
+        priestCheckBox.setText("Priest");
+        priestCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                heroClassCheckBoxItemStateChanged(evt);
+            }
+        });
+
+        startGameBtn.setText("Start Game");
+        startGameBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startGameBtnActionPerformed(evt);
+            }
+        });
+
+        heroClassLabel.setText("Hero Class:");
+
+        createNewHeroPanel.setVisible(false);
+
+        javax.swing.GroupLayout createNewHeroPanelLayout = new javax.swing.GroupLayout(createNewHeroPanel);
+        createNewHeroPanel.setLayout(createNewHeroPanelLayout);
+        createNewHeroPanelLayout.setHorizontalGroup(
+            createNewHeroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(createNewHeroPanelLayout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(heroNameLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(heroName, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(118, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, createNewHeroPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(createNewHeroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(startGameBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(createNewHeroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(heroClassLabel)
+                        .addComponent(warriorCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(hunterCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(priestCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(132, 132, 132))
+        );
+        createNewHeroPanelLayout.setVerticalGroup(
+            createNewHeroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(createNewHeroPanelLayout.createSequentialGroup()
+                .addGap(65, 65, 65)
+                .addGroup(createNewHeroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(heroNameLabel)
+                    .addComponent(heroName, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(heroClassLabel)
+                .addGap(4, 4, 4)
+                .addComponent(warriorCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(hunterCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(priestCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(startGameBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout btnContainerLayout = new javax.swing.GroupLayout(btnContainer);
@@ -120,24 +221,27 @@ public class newGui extends javax.swing.JFrame {
                     .addComponent(createNewHeroBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(selectExsitingHero)
                     .addComponent(exitGame, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(createNewHeroPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(availableHeroPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         btnContainerLayout.setVerticalGroup(
             btnContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(btnContainerLayout.createSequentialGroup()
-                .addGroup(btnContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(availableHeroPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(btnContainerLayout.createSequentialGroup()
-                        .addGap(67, 67, 67)
-                        .addComponent(selectExsitingHero, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
-                        .addComponent(createNewHeroBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(exitGame, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addGap(67, 67, 67)
+                .addComponent(selectExsitingHero, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(createNewHeroBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(exitGame, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(btnContainerLayout.createSequentialGroup()
+                .addGroup(btnContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(createNewHeroPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(availableHeroPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 7, Short.MAX_VALUE))
         );
 
         availableHeroPanel.setVisible(false);
@@ -150,7 +254,9 @@ public class newGui extends javax.swing.JFrame {
         );
         containerPanelLayout.setVerticalGroup(
             containerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnContainer, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(containerPanelLayout.createSequentialGroup()
+                .addComponent(btnContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -176,56 +282,150 @@ public class newGui extends javax.swing.JFrame {
     }//GEN-LAST:event_exitGameActionPerformed
 
     private void createNewHeroBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createNewHeroBtnActionPerformed
-        // TODO add your handling code here:
-//        if (createNewHeroBtn.isVisible()) {
-//            createNewHeroBtn.setVisible(false);
-//        }
+
+        createNewHeroPanel.setVisible(true);
+        createNewHeroBtn.setVisible(false);
+        selectExsitingHero.setVisible(false);
+        pack();
     }//GEN-LAST:event_createNewHeroBtnActionPerformed
 
     private void selectExsitingHeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectExsitingHeroActionPerformed
-        // TODO add your handling code here:
-//        if (createNewHeroBtn.isVisible()) {
-//            createNewHeroBtn.setVisible(false);
-//        }
+
         availableHeroPanel.setVisible(true);
+        createNewHeroBtn.setVisible(false);
+        selectExsitingHero.setVisible(false);
         pack();
     }//GEN-LAST:event_selectExsitingHeroActionPerformed
 
     private void availableHeroPanelComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_availableHeroPanelComponentShown
-        // TODO add your handling code here:
-        
+
         final ResultSet heroesAvailableFromDatabase;
-	ArrayList<String> heroesAvailable = new ArrayList<>();
-        
+        ArrayList<String> heroesAvailable = new ArrayList<>();
+
         try {
             heroesAvailableFromDatabase = controller.getAvailableHeroes();
             while (heroesAvailableFromDatabase.next()) {
-		heroesAvailable.add(heroesAvailableFromDatabase.getString("name"));
+                heroesAvailable.add(heroesAvailableFromDatabase.getString("name"));
             }
-	} catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-	}
-	if (!heroesAvailable.isEmpty()) {
+        }
+        if (!heroesAvailable.isEmpty()) {
             for (String heroName : heroesAvailable) {
-                heroNames.addItem(heroName);
+                availableHeroes.addItem(heroName);
             }
         }
     }//GEN-LAST:event_availableHeroPanelComponentShown
 
-    private void heroNamesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_heroNamesItemStateChanged
-        // TODO add your handling code here:
-        System.out.println(evt.getItem().toString());
-    }//GEN-LAST:event_heroNamesItemStateChanged
+    private void availableHeroesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_availableHeroesItemStateChanged
 
+        ResultSet selectedHero = null;
+        StringBuilder heroStats = new StringBuilder();
+        
+        try {
+            selectedHero = controller.selectHero(evt.getItem().toString());
+        } catch (SQLException ex) {
+            Logger.getLogger(newGui.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (selectedHero != null) {
+            heroStats.append("\n");
+            try {
+                heroStats.append(" Hero Name: " + selectedHero.getString("name"));
+                heroStats.append("\n");
+                heroStats.append(" Hero Class: " + selectedHero.getString("heroclass"));
+                heroStats.append("\n");
+                heroStats.append(" Armor: " + selectedHero.getString("armor"));
+                heroStats.append("\n");
+                heroStats.append(" Weapon: " + selectedHero.getString("weapon"));
+                heroStats.append("\n");
+                heroStats.append(" Attack Points: " + selectedHero.getInt("attack"));
+                heroStats.append("\n");
+                heroStats.append(" Defense Points: " + selectedHero.getInt("defense"));
+                heroStats.append("\n");
+                heroStats.append(" Helm Points: " + selectedHero.getInt("helm"));
+                heroStats.append("\n");
+                heroStats.append(" Hit Points: " + selectedHero.getInt("hitpoints"));
+                heroStats.append("\n");
+                heroStats.append(" Level: " + selectedHero.getInt("level"));
+                heroStats.append("\n");
+                heroStats.append(" Experience: " + selectedHero.getInt("experience"));
+            } catch (SQLException ex) {
+                Logger.getLogger(newGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            jTextArea1.setText(heroStats.toString());
+        }
+    }//GEN-LAST:event_availableHeroesItemStateChanged
+
+    private void heroClassCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_heroClassCheckBoxItemStateChanged
+
+        if (warriorCheckBox.isSelected()) {
+            hunterCheckBox.setSelected(false);
+            priestCheckBox.setSelected(false);
+        }
+        if (priestCheckBox.isSelected()) {
+            warriorCheckBox.setSelected(false);
+            hunterCheckBox.setSelected(false);
+        }
+        if (hunterCheckBox.isSelected()) {
+            warriorCheckBox.setSelected(false);
+            priestCheckBox.setSelected(false);
+        }
+    }//GEN-LAST:event_heroClassCheckBoxItemStateChanged
+
+    private void startGameBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startGameBtnActionPerformed
+
+        if (!heroName.getText().isEmpty()) {
+            String heroClass = null;
+            if (warriorCheckBox.isSelected()) {
+                heroClass = warriorCheckBox.getText();
+            } else if (hunterCheckBox.isSelected()) {
+                heroClass = hunterCheckBox.getText();
+            } else if (priestCheckBox.isSelected()) {
+                heroClass = priestCheckBox.getText();
+            }
+            if (heroClass != null) {
+                try {
+                    if (controller.checkIfHeroNameExist(heroName.getText(), heroClass)) {
+                        setHero(controller.createHero(heroName.getText()));
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "Please Pick A Different Hero Name..." + heroName.getText() + " Exists",
+                                "Hero Name",
+                                JOptionPane.WARNING_MESSAGE);
+                    }
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Please Pick A Hero Class For The Hero",
+                        "Hero Class",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Hero Name Cannot Be Empty",
+                    "Empty Hero Name",
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_startGameBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel availableHeroPanel;
+    private javax.swing.JComboBox<String> availableHeroes;
     private javax.swing.JPanel btnContainer;
     private javax.swing.JPanel containerPanel;
     private javax.swing.JButton createNewHeroBtn;
+    private javax.swing.JPanel createNewHeroPanel;
     private javax.swing.JButton exitGame;
-    private javax.swing.JComboBox<String> heroNames;
+    private javax.swing.JTextField heroName;
+    private javax.swing.JCheckBox hunterCheckBox;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JCheckBox priestCheckBox;
     private javax.swing.JButton selectExsitingHero;
+    private javax.swing.JButton startGameBtn;
     private javax.swing.JPanel statsPanel;
+    private javax.swing.JCheckBox warriorCheckBox;
     // End of variables declaration//GEN-END:variables
 }
