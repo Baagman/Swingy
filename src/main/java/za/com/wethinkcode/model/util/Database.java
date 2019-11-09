@@ -143,17 +143,17 @@ public class Database {
                 if (hero.getArmor() != null) {
                     preparedStatement.setString(5, hero.getArmor().getName());
                 } else {
-                    preparedStatement.setString(5, null);
+                    preparedStatement.setString(5, "none");
                 }
                 if (hero.getWeapon() != null) {
                     preparedStatement.setString(6, hero.getWeapon().getName());
                 } else {
-                    preparedStatement.setString(6, null);
+                    preparedStatement.setString(6, "none");
                 }
                 if (hero.getHelm() != null) {
                     preparedStatement.setString(7, hero.getHelm().getName());
                 } else {
-                    preparedStatement.setString(7, null);
+                    preparedStatement.setString(7, "none");
                 }
                 preparedStatement.setInt(8, hero.getLevel());
                 preparedStatement.setString(9, hero.getName());

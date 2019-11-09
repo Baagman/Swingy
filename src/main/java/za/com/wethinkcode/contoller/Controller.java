@@ -25,7 +25,7 @@ import za.com.wethinkcode.model.artefacts.Weapon;
 import za.com.wethinkcode.model.characters.*;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.model.util.Database;
-import za.com.wethinkcode.view.gui.Gui;
+
 import javax.validation.*;
 
 @Getter
@@ -39,7 +39,6 @@ public class Controller {
     private static boolean              quitGame;
     private static boolean              consoleViewMode;
     private ArrayList<Villain>          villains;
-    private Gui                         gui;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private HashMap<Integer, String>    armor;
