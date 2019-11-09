@@ -18,12 +18,21 @@ import za.com.wethinkcode.model.artefacts.Helm;
 import za.com.wethinkcode.model.artefacts.Weapon;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
 public abstract class Hero extends Characters {
 
+    @NotBlank(message = "Hero Class Cannot Be Empty")
     private String heroClass;
+    @Min(value = 1, message = "Min Start Level Is 1")
+    @Max(value = 5, message = "Max Level Is 5")
     private int level;
+    @Min(value = 1000, message = "Min Experience Is 1000")
+    @Max(value = 12200, message = "Max Experience Is 12200")
     private int experience;
 
     private Weapon weapon;

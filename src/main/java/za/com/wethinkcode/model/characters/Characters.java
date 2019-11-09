@@ -15,17 +15,24 @@ import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+
 @Getter
 @Setter
 abstract public class Characters {
 
+    @Size(min = 4, max = 20, message = "Character Name Has To Be Between 4 AND 20 Characters Long")
     protected String name;
+    @Min(value = 1)
     protected int attack;
+    @Min(value = 1)
     protected int defense;
+    @Min(value = 1)
     protected int hitPoints;
     protected Coordinates position;
 
-    protected Characters(String name, int attack, int defense, int hitPoints) {
+    Characters(String name, int attack, int defense, int hitPoints) {
         this.name = name;
         this.attack = attack;
         this.defense = defense;

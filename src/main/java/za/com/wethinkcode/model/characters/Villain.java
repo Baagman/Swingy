@@ -13,7 +13,6 @@ package za.com.wethinkcode.model.characters;
 
 import lombok.Getter;
 import lombok.Setter;
-import za.com.wethinkcode.model.artefacts.Artefact;
 
 @Getter
 @Setter

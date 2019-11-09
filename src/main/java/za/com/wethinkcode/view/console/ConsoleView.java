@@ -82,7 +82,7 @@ public class ConsoleView {
                                 if (!userInput.isEmpty()) {
                                     emptyHeroName = false;
                                     if (controller.checkIfHeroNameExist(userInput, heroClass)) {
-                                        setHero(controller.createHero(userInput));
+                                        setHero(controller.createNewHero(userInput, heroClass));
                                         if (hero == null) {
                                             throw new InvalidHero("Cannot Create New Hero");
                                         } else {
@@ -112,7 +112,7 @@ public class ConsoleView {
             for (int x = 0; x < mapSize; x++) {
                 if ((x == getHero().getPosition().getX()) && (y == getHero().getPosition().getY())) {
                     this.map[y][x] = "H";
-                } else if (getVillainsToDisplay(villains, x, y)) {
+                } else if (controller.getVillainsToDisplay(villains, x, y)) {
                     this.map[y][x] = "E";
                 } else {
                     this.map[y][x] = ".";
@@ -149,6 +149,10 @@ public class ConsoleView {
                 System.out.println("1 - Run");
                 System.out.println("2 - Fight");
                 break;
+	        case "forced fight":
+	        	System.out.println("You Must Fight.....");
+		        System.out.println("1 - Fight");
+		        break;
             case "battle won":
                 System.out.println("You Won The Battle");
                 System.out.println("-----------------------");
@@ -199,18 +203,6 @@ public class ConsoleView {
         }
         return id;
     }
-
-    private boolean getVillainsToDisplay(ArrayList<Villain> villains, int x, int y) {
-        for (Villain villain : villains) {
-            if (villain.getPosition().getY() == y) {
-                if (villain.getPosition().getX() == x) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     private void displayVillainStats(Villain villain) {
         System.out.println(villain.getName() + " Encountered");
         System.out.println("Attack: " + villain.getAttack());
@@ -283,39 +275,16 @@ public class ConsoleView {
                     invalidInput = false;
                     break;
                 case "1":
-                    hero.Run(coordinates);
+                	if (controller.runOrFight(villain)) {
+                		forcedFight(villain);
+	                } else
+                        hero.Run(coordinates);
                     invalidInput = false;
                     break;
                 case "2":
                     invalidInput = false;
-                    if (controller.simulateFight(villain)) {
-                        displayOptions("battle won");
-                        Artefact artefact = controller.generateRandomArtifact(villain);
-                        if (artefact != null) {
-                            displayArtefactStats(villain, artefact);
-                            displayOptions("artefact dropped");
-                            userInput = scanner.nextLine();
-                            if (userInput.equals("1")) {
-                                try {
-                                    controller.Equip(artefact);
-                                } catch (SQLException sqlException) {
-                                    System.out.println("Error: " + sqlException.getMessage());
-                                    quitGame = false;
-                                }
-                            }
-                        }
-                        isHeroLevelUp(villain);
-                        try {
-                            controller.updateHero();
-                        } catch (SQLException sqlException) {
-                            System.out.println("Error: " + sqlException.getMessage());
-                            quitGame = false;
-                        }
-                    } else {
-                        displayOptions("Battle Lost");
-                        quitGame = false;
-                    }
-                    break;
+	                fight(villain);
+	                break;
                 default:
                     System.out.println("Invalid Input...Please Try Again");
             }
@@ -340,13 +309,13 @@ public class ConsoleView {
                         System.out.println("You Have Used All Your Retries...Exiting");
                         quitGame = false;
                         break;
-                    } else {
-                        System.out.println("Warning: No Such Hero...Please Try Again");
-                        System.out.println("-----------------------");
+                    } else if (numberOfTries > 0) {
+                        quitGame = true;
                     }
                 }
             } else {
                 System.out.println("No Available Heroes...Please Try Another Option");
+                numberOfTries = 0;
                 break;
             }
         }
@@ -355,12 +324,50 @@ public class ConsoleView {
         }
     }
 
-    private void isHeroLevelUp(Villain villain) {
-        villains.remove(villain);
-        int playerPosition = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2))) / 2;
-        if ((playerPosition == hero.getPosition().getX()) && (playerPosition == hero.getPosition().getY())) {
-            villains = null;
-            villains = controller.generateVillains();
-        }
+    private void forcedFight(Villain villain) {
+    	String userInput;
+    	while (true) {
+		    printAndUpdateMap();
+		    displayVillainStats(villain);
+		    displayOptions("forced fight");
+		    userInput = scanner.nextLine();
+		    if ("1".equals(userInput)) {
+			    fight(villain);
+			    break;
+		    } else {
+			    System.out.println("Invalid Input...Please Try Again");
+		    }
+	    }
     }
+
+	private void fight(Villain villain) {
+		String userInput;
+		if (controller.simulateFight(villain)) {
+			displayOptions("battle won");
+			Artefact artefact = controller.generateRandomArtifact(villain);
+			if (artefact != null) {
+				displayArtefactStats(villain, artefact);
+				displayOptions("artefact dropped");
+				userInput = scanner.nextLine();
+				if (userInput.equals("1")) {
+					try {
+						controller.Equip(artefact);
+					} catch (SQLException sqlException) {
+						System.out.println("Error: " + sqlException.getMessage());
+						quitGame = false;
+					}
+				}
+			}
+			villains = controller.isHeroLevelUp();
+			try {
+				controller.updateHero();
+			} catch (SQLException sqlException) {
+				System.out.println("Error: " + sqlException.getMessage());
+				quitGame = false;
+			}
+		} else {
+			displayOptions("Battle Lost");
+			quitGame = false;
+		}
+	}
 }

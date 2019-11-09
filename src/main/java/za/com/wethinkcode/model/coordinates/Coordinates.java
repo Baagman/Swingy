@@ -14,11 +14,15 @@ package za.com.wethinkcode.model.coordinates;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
+
 @Getter
 @Setter
 public class Coordinates {
 
+    @Min(value = 0)
     private int x;
+    @Min(value = 0)
     private int y;
 
     public Coordinates(int x, int y) {

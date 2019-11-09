@@ -17,8 +17,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import za.com.wethinkcode.model.artefacts.Artefact;
@@ -92,9 +90,9 @@ public class Database {
             PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsertHero.toString());
             preparedStatement.setString(1, heroName);
             preparedStatement.setString(2, heroClass);
-            preparedStatement.setString(3, null);
-            preparedStatement.setString(4, null);
-            preparedStatement.setString(5, null);
+            preparedStatement.setString(3, "none");
+            preparedStatement.setString(4, "none");
+            preparedStatement.setString(5, "none");
             preparedStatement.setInt(6, attack);
             preparedStatement.setInt(7, defense);
             preparedStatement.setInt(8, hitpoints);

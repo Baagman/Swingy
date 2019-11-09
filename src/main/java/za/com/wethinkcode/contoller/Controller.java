@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,54 +25,58 @@ import za.com.wethinkcode.model.artefacts.Weapon;
 import za.com.wethinkcode.model.characters.*;
 import za.com.wethinkcode.model.coordinates.Coordinates;
 import za.com.wethinkcode.model.util.Database;
-import za.com.wethinkcode.view.console.ConsoleView;
 import za.com.wethinkcode.view.gui.Gui;
+import javax.validation.*;
 
 @Getter
 @Setter
 public class Controller {
 
-    private Hero hero;
-    private ConsoleView consoleView;
-    private Scanner scanner;
-    private Database database;
+    private Hero                        hero;
+    private Database                    database;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private static boolean quitGame;
-    private static boolean consoleViewMode;
-    private ArrayList<Villain> villains;
-    private Gui gui;
-
+    private static boolean              quitGame;
+    private static boolean              consoleViewMode;
+    private ArrayList<Villain>          villains;
+    private Gui                         gui;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    private HashMap<Integer, String> armor;
+    private HashMap<Integer, String>    armor;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    private HashMap<Integer, String> weapon;
+    private HashMap<Integer, String>    weapon;
+    private Validator                   validator;
 
     public Controller(Database database) {
         this.database = database;
+	    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+	    validator = factory.getValidator();
     }
 
     public void Move(String direction) {
         int sizeOfMap = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2)));
 
         switch (direction) {
+            case "North":
             case "1":
                 if (hero.getPosition().getY() > 0) {
                     hero.getPosition().setY(hero.getPosition().getY() - 1);
                 }
                 break;
+            case "East":
             case "2":
                 if (hero.getPosition().getX() < sizeOfMap - 1) {
                     hero.getPosition().setX(hero.getPosition().getX() + 1);
                 }
                 break;
+            case "South":
             case "4":
                 if (hero.getPosition().getY() < (sizeOfMap - 1)) {
                     hero.getPosition().setY(hero.getPosition().getY() + 1);
                 }
                 break;
+            case "West":
             case "3":
                 if (hero.getPosition().getX() > 0) {
                     hero.getPosition().setX(hero.getPosition().getX() - 1);
@@ -85,54 +88,136 @@ public class Controller {
     public Hero createHero(String heroName) throws SQLException {
         String heroClass;
         Hero hero = null;
-        ResultSet artefacts;
         ResultSet resultSet = database.selectHero(heroName);
 
         if ((resultSet != null) && (resultSet.next())) {
-            heroClass = resultSet.getString("heroClass");
-            if (heroClass.equalsIgnoreCase("Warrior")) {
-                hero = new Warrior(resultSet.getString("name"),
-                        resultSet.getInt("attack"),
-                        resultSet.getInt("defense"),
-                        resultSet.getInt("hitpoints"),
-                        resultSet.getInt("level"),
-                        resultSet.getInt("experience"));
-            } else if (heroClass.equalsIgnoreCase("Hunter")) {
-                hero = new Hunter(resultSet.getString("name"),
-                        resultSet.getInt("attack"),
-                        resultSet.getInt("defense"),
-                        resultSet.getInt("hitpoints"),
-                        resultSet.getInt("level"),
-                        resultSet.getInt("experience"));
-            } else if (heroClass.equalsIgnoreCase("Priest")) {
-                hero = new Priest(resultSet.getString("name"),
-                        resultSet.getInt("attack"),
-                        resultSet.getInt("defense"),
-                        resultSet.getInt("hitpoints"),
-                        resultSet.getInt("level"),
-                        resultSet.getInt("experience"));
-            }
-
-            if (hero != null) {
-                artefacts = database.selectArtefacts(resultSet.getInt("id"));
-                int points;
-                String artefactName;
-                while (artefacts.next()) {
-                    points = artefacts.getInt("points");
-                    artefactName = artefacts.getString("name");
-                    if (artefacts.getString("type").equalsIgnoreCase("helm")) {
-                        hero.setHelm(generateHelm(artefactName, points));
-                    } else if (artefacts.getString("type").equalsIgnoreCase("armor")) {
-                        hero.setArmor(generateArmor(artefactName, points));
-                    } else if (artefacts.getString("type").equalsIgnoreCase("weapon")) {
-                        hero.setWeapon(generateWeapon(artefactName, points));
-                    }
-                }
-                setHero(hero);
-                getHero().setHeroClass(heroClass);
-            }
+	        heroClass = resultSet.getString("heroClass");
+	        if (heroClass.equalsIgnoreCase("Warrior")) {
+		        hero = new Warrior(resultSet.getString("name"),
+				        resultSet.getInt("attack"),
+				        resultSet.getInt("defense"),
+				        resultSet.getInt("hitpoints"),
+				        resultSet.getInt("level"),
+				        resultSet.getInt("experience"));
+	        } else if (heroClass.equalsIgnoreCase("Hunter")) {
+		        hero = new Hunter(resultSet.getString("name"),
+				        resultSet.getInt("attack"),
+				        resultSet.getInt("defense"),
+				        resultSet.getInt("hitpoints"),
+				        resultSet.getInt("level"),
+				        resultSet.getInt("experience"));
+	        } else if (heroClass.equalsIgnoreCase("Priest")) {
+		        hero = new Priest(resultSet.getString("name"),
+				        resultSet.getInt("attack"),
+				        resultSet.getInt("defense"),
+				        resultSet.getInt("hitpoints"),
+				        resultSet.getInt("level"),
+				        resultSet.getInt("experience"));
+	        }
+	        if (getArtefact(heroClass, hero, resultSet))
+	        	return hero;
         }
-        return hero;
+        return null;
+    }
+
+	private boolean getArtefact(String heroClass, Hero hero, ResultSet resultSet) throws SQLException {
+		ResultSet artefacts;
+		boolean heroValidated = false;
+		if (hero != null) {
+			artefacts = database.selectArtefacts(resultSet.getInt("id"));
+			int points;
+			String artefactName;
+			while (artefacts.next()) {
+				points = artefacts.getInt("points");
+				artefactName = artefacts.getString("name");
+				if (artefacts.getString("type").equalsIgnoreCase("helm")) {
+					hero.setHelm(generateHelm(artefactName, points));
+				} else if (artefacts.getString("type").equalsIgnoreCase("armor")) {
+					hero.setArmor(generateArmor(artefactName, points));
+				} else if (artefacts.getString("type").equalsIgnoreCase("weapon")) {
+					hero.setWeapon(generateWeapon(artefactName, points));
+				}
+			}
+			setHero(hero);
+			getHero().setHeroClass(heroClass);
+			heroValidated = validateHero(hero);
+		}
+		return heroValidated;
+	}
+
+	private boolean validateHero(Hero hero) {
+    	boolean validated = true;
+    	Set<ConstraintViolation<Hero>> constraintViolations = validator.validate(hero);
+    	if (constraintViolations.size() > 0) {
+    		for (ConstraintViolation<Hero> violation : constraintViolations) {
+    			System.out.println(violation.getMessage());
+    		}
+    		validated = false;
+    	}
+    	if (validated) {
+    		if (hero.getArmor() != null) {
+    			validated = validateArtefact(hero.getArmor());
+    		} else if (hero.getWeapon() != null) {
+    			validated = validateArtefact(hero.getWeapon());
+    		} else if (hero.getHelm() != null) {
+    			validated = validateArtefact(hero.getHelm());
+    		}
+    	}
+		return validated;
+    }
+
+	private boolean validateArtefact(Artefact artefact) {
+		if (artefact != null) {
+			Set<ConstraintViolation<Artefact>> constraintViolations = validator.validate(artefact);
+			if (constraintViolations.size() > 0) {
+				for (ConstraintViolation<Artefact> violation : constraintViolations) {
+					System.out.println(violation.getMessage());
+				}
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public Hero createNewHero(String heroName, String HeroClass) throws SQLException {
+	    Hero hero = null;
+	    int experience = 1000;
+	    int level = 1;
+	    int defense = 0;
+	    int attack = 0;
+	    int hitpoints = 12;
+
+		switch (HeroClass) {
+			case "Warrior":
+				attack = 10;
+				defense = 15;
+				break;
+			case "Hunter":
+				attack = 8;
+				defense = 20;
+				break;
+			case "Priest":
+				attack = 4;
+				defense = 10;
+				break;
+		}
+	    if (HeroClass.equalsIgnoreCase("Warrior")) {
+	    	hero = new Warrior(heroName, attack, defense, hitpoints, level, experience);
+	    } else if (HeroClass.equalsIgnoreCase("Hunter")) {
+	    	hero = new Hunter(heroName, attack, defense, hitpoints, level, experience);
+	    } else if (HeroClass.equalsIgnoreCase("Priest")) {
+		    hero = new Priest(heroName, attack, defense, hitpoints, level, experience);
+	    }
+
+	    if (hero != null) {
+		    if (validateHero(hero)) {
+		        database.addNewHeroToTable(heroName, HeroClass);
+		        setHero(hero);
+		        hero.setHeroClass(HeroClass);
+		        return hero;
+		    }
+	    }
+	    return null;
     }
 
     public void Equip(Artefact artefact) throws SQLException {
@@ -152,15 +237,19 @@ public class Controller {
         int coordsX = coordinates.getX();
 
         switch (userInput) {
+            case "North":
             case "1":
                 coordsY--;
                 break;
+            case "East":
             case "2":
                 coordsX++;
                 break;
+            case "South":
             case "4":
                 coordsY++;
                 break;
+            case "West":
             case "3":
                 coordsX--;
                 break;
@@ -190,8 +279,6 @@ public class Controller {
             ResultSet resultSet = database.selectHero(heroName);
             if ((resultSet != null) && (resultSet.next())) {
                 isExist = false;
-            } else {
-                database.addNewHeroToTable(heroName, heroClass);
             }
         } else {
             isExist = false;
@@ -229,7 +316,7 @@ public class Controller {
 
     public boolean simulateFight(Villain villain) {
         Random random = new Random();
-        while ((hero.getHitPoints() > 0) && (villain.getHitPoints() > 0)) {
+        while ((hero.getHitPoints() >= 0) && (villain.getHitPoints() >= 0)) {
             int heroAction = random.nextInt(2);
             int villainAction = random.nextInt(2);
             int damageTaken;
@@ -251,10 +338,13 @@ public class Controller {
                     damageTaken = 0;
                 }
                 hero.setHitPoints(villain.getHitPoints() - damageTaken);
+            } else {
+	            villain.setHitPoints(hero.getHitPoints() - hero.getAttack());
             }
         }
         if (hero.getHitPoints() > 0) {
             int xp = villain.getAttack() + villain.getDefense();
+            villains.remove(villain);
             addExperience(xp);
             return true;
         }
@@ -265,16 +355,23 @@ public class Controller {
         Random random = new Random();
         HashMap<String, Integer> villainStats = new HashMap<>();
         int randomNumber = random.nextInt(2);
-        int hotPoints = random.nextInt(hero.getHitPoints() + 1);
+        int hotPoints = random.nextInt(hero.getLevel() * 5);
 
-        villainStats.put("Attack", random.nextInt(hero.getAttack()));
-        villainStats.put("Defense", random.nextInt(hero.getDefense()));
-        if (randomNumber == 0) {
-            return new DarkElf("Dark Elf", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints);
-        } else if (randomNumber == 1) {
-            return new Ogre("Ogre", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints);
-        } else {
-            return null;
+        if (hero.getAttack() <= 0) {
+	        villainStats.put("Attack", random.nextInt(hero.getAttack()));
+        } else
+        	villainStats.put("Attack", random.nextInt(hero.getAttack() / 2));
+        if (hero.getDefense() <= 0)
+	        villainStats.put("Defense", random.nextInt(hero.getDefense()));
+        else
+	        villainStats.put("Defense", random.nextInt(hero.getDefense()));
+        switch (randomNumber) {
+            case 0:
+                return new DarkElf("Dark Elf", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints);
+            case 1:
+                return new Ogre("Ogre", villainStats.get("Attack"), villainStats.get("Defense"), hotPoints);
+            default:
+                return null;
         }
     }
 
@@ -288,7 +385,6 @@ public class Controller {
             hero.setLevel(hero.getLevel() + 1);
             playerPosition = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2))) / 2;
             hero.setPosition(new Coordinates(playerPosition, playerPosition));
-            villains = null;
         }
     }
 
@@ -335,21 +431,58 @@ public class Controller {
     }
 
     public boolean GameWon() {
+    	boolean reachedBorder = false;
         int mapSize = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2)));
         if ((hero.getPosition().getX() == 0) || (hero.getPosition().getY() == 0)) {
-            return true;
+        	reachedBorder = checkBorder(hero.getPosition().getX(), hero.getPosition().getY(), mapSize);
         } else if ((mapSize == hero.getPosition().getX() + 1) || (mapSize == hero.getPosition().getY() + 1)) {
-            return true;
-        } else {
-            return false;
+            reachedBorder = checkBorder(hero.getPosition().getX(), hero.getPosition().getY(), mapSize);
         }
+        return reachedBorder;
     }
 
     public ResultSet getAvailableHeroes() throws SQLException {
         return database.AvailableHeroes();
     }
-    
+
     public ResultSet selectHero(String heroName) throws SQLException {
         return database.selectHero(heroName);
+    }
+
+    public boolean getVillainsToDisplay(ArrayList<Villain> villains, int x, int y) {
+        for (Villain villain : villains) {
+            if (villain.getPosition().getY() == y) {
+                if (villain.getPosition().getX() == x) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public ArrayList<Villain> isHeroLevelUp() {
+        int playerPosition = (((hero.getLevel() - 1) * 5) + (10 - (hero.getLevel() % 2))) / 2;
+        if ((playerPosition == hero.getPosition().getX()) && (playerPosition == hero.getPosition().getY())) {
+            this.villains = null;
+            this.villains = generateVillains();
+        }
+        return this.villains;
+    }
+    
+    public boolean runOrFight(Villain villainEncounter) {
+
+    	if (((hero.getDefense() - (villainEncounter.getAttack())) >= 0) && (villainEncounter.getHitPoints() < hero.getHitPoints()))
+    		return true;
+    	else return ((villainEncounter.getDefense() - (hero.getAttack())) <= 0) && (villainEncounter.getHitPoints() < hero.getHitPoints());
+    }
+
+    private boolean checkBorder(int x, int y, int mapSize) {
+    	for (Villain villain : villains) {
+    		if ((villain.getPosition().getY() == y) && (villain.getPosition().getX() == x))
+    			return false;
+    		else if (((villain.getPosition().getX() + 1) == mapSize) && ((villain.getPosition().getY() + 1) == mapSize))
+    			return false;
+	    }
+    	return true;
     }
 }
